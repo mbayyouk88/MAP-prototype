@@ -1,0 +1,191 @@
+/* ============================================================
+   Colibri Design System — Colors & Typography
+   Source: Pixel-sampled from Colibri_Logo_COLOR.png
+   Font substitution: Nunito (wordmark), DM Sans (UI)
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+
+  /* ── Brand Colors ─────────────────────────────────────────── */
+  --color-brand:          #d60436;   /* Colibri Red — primary brand */
+  --color-brand-dark:     #a8002a;   /* Hover / pressed */
+  --color-brand-darker:   #7a001f;   /* Active / deep */
+  --color-brand-light:    #ff3358;   /* Lighter variant */
+  --color-brand-subtle:   #fff0f3;   /* Very light tint — bg accent */
+  --color-brand-on:       #ffffff;   /* Text on brand bg */
+
+  /* ── Neutrals ─────────────────────────────────────────────── */
+  --color-neutral-900:    #292929;   /* Primary text / charcoal */
+  --color-neutral-800:    #3d3d3d;
+  --color-neutral-700:    #555555;   /* Secondary text */
+  --color-neutral-600:    #6e6e6e;
+  --color-neutral-500:    #888888;   /* Placeholder / muted */
+  --color-neutral-400:    #a3a3a3;
+  --color-neutral-300:    #c4c4c4;   /* Borders, dividers */
+  --color-neutral-200:    #e0e0e0;   /* Light borders */
+  --color-neutral-100:    #f0f0f0;   /* Hover bg */
+  --color-neutral-50:     #f9f9f9;   /* Page bg */
+  --color-white:          #ffffff;
+
+  /* ── Semantic ─────────────────────────────────────────────── */
+  --color-success:        #1a9e5c;
+  --color-success-bg:     #edfbf4;
+  --color-warning:        #e8860a;
+  --color-warning-bg:     #fff8ec;
+  --color-error:          #d60436;
+  --color-error-bg:       #fff0f3;
+  --color-info:           #0a6ed1;
+  --color-info-bg:        #eef5ff;
+
+  /* ── Background / Surface ─────────────────────────────────── */
+  --color-bg:             #ffffff;
+  --color-bg-subtle:      #f9f9f9;
+  --color-bg-raised:      #ffffff;
+  --color-border:         #e8e8e8;
+  --color-border-strong:  #c4c4c4;
+
+  /* ── Text ─────────────────────────────────────────────────── */
+  --color-text-primary:   #292929;
+  --color-text-secondary: #555555;
+  --color-text-muted:     #888888;
+  --color-text-disabled:  #a3a3a3;
+  --color-text-inverse:   #ffffff;
+  --color-text-brand:     #d60436;
+  --color-text-link:      #d60436;
+
+  /* ── Typography — Font Families ──────────────────────────── */
+  --font-display:   'Nunito', system-ui, sans-serif;   /* Wordmark / hero headings */
+  --font-body:      'DM Sans', system-ui, sans-serif;  /* UI, body text */
+  --font-mono:      'JetBrains Mono', monospace;       /* Code, data */
+
+  /* ── Typography — Scale ─────────────────────────────────── */
+  --text-xs:    12px;
+  --text-sm:    14px;
+  --text-base:  16px;
+  --text-md:    18px;
+  --text-lg:    20px;
+  --text-xl:    24px;
+  --text-2xl:   32px;
+  --text-3xl:   40px;
+  --text-4xl:   56px;
+
+  /* ── Typography — Weights ─────────────────────────────────── */
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-extrabold: 800;
+
+  /* ── Typography — Line Heights ─────────────────────────────── */
+  --lh-tight:   1.2;
+  --lh-snug:    1.35;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.7;
+
+  /* ── Typography — Semantic roles ─────────────────────────── */
+  --type-display-font:   var(--font-display);
+  --type-display-size:   var(--text-4xl);
+  --type-display-weight: var(--fw-bold);
+  --type-display-lh:     var(--lh-tight);
+
+  --type-h1-font:   var(--font-display);
+  --type-h1-size:   var(--text-3xl);
+  --type-h1-weight: var(--fw-bold);
+  --type-h1-lh:     var(--lh-tight);
+
+  --type-h2-font:   var(--font-display);
+  --type-h2-size:   var(--text-2xl);
+  --type-h2-weight: var(--fw-semibold);
+  --type-h2-lh:     var(--lh-snug);
+
+  --type-h3-font:   var(--font-body);
+  --type-h3-size:   var(--text-xl);
+  --type-h3-weight: var(--fw-semibold);
+  --type-h3-lh:     var(--lh-snug);
+
+  --type-h4-font:   var(--font-body);
+  --type-h4-size:   var(--text-lg);
+  --type-h4-weight: var(--fw-medium);
+  --type-h4-lh:     var(--lh-snug);
+
+  --type-body-font:   var(--font-body);
+  --type-body-size:   var(--text-base);
+  --type-body-weight: var(--fw-regular);
+  --type-body-lh:     var(--lh-normal);
+
+  --type-small-font:   var(--font-body);
+  --type-small-size:   var(--text-sm);
+  --type-small-weight: var(--fw-regular);
+  --type-small-lh:     var(--lh-normal);
+
+  --type-label-font:   var(--font-body);
+  --type-label-size:   var(--text-sm);
+  --type-label-weight: var(--fw-medium);
+  --type-label-lh:     1.2;
+
+  --type-caption-font:   var(--font-body);
+  --type-caption-size:   var(--text-xs);
+  --type-caption-weight: var(--fw-regular);
+  --type-caption-lh:     var(--lh-normal);
+
+  --type-code-font:   var(--font-mono);
+  --type-code-size:   var(--text-sm);
+  --type-code-weight: var(--fw-regular);
+  --type-code-lh:     var(--lh-relaxed);
+
+  /* ── Spacing ─────────────────────────────────────────────── */
+  --space-1:    4px;
+  --space-2:    8px;
+  --space-3:    12px;
+  --space-4:    16px;
+  --space-5:    20px;
+  --space-6:    24px;
+  --space-8:    32px;
+  --space-10:   40px;
+  --space-12:   48px;
+  --space-16:   64px;
+  --space-24:   96px;
+
+  /* ── Corner Radii ─────────────────────────────────────────── */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   20px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,.10), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md:  0 4px 16px rgba(0,0,0,.10), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+  --shadow-xl:  0 16px 48px rgba(0,0,0,.14);
+  --shadow-brand: 0 4px 16px rgba(214,4,54,.25);
+
+  /* ── Transitions ─────────────────────────────────────────── */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast:   150ms;
+  --duration-normal: 250ms;
+  --duration-slow:   400ms;
+  --transition-base: var(--duration-fast) var(--ease-standard);
+}
+
+/* ── Semantic element defaults ─────────────────────────────── */
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 { font-family: var(--type-h1-font); font-size: var(--type-h1-size); font-weight: var(--type-h1-weight); line-height: var(--type-h1-lh); }
+h2 { font-family: var(--type-h2-font); font-size: var(--type-h2-size); font-weight: var(--type-h2-weight); line-height: var(--type-h2-lh); }
+h3 { font-family: var(--type-h3-font); font-size: var(--type-h3-size); font-weight: var(--type-h3-weight); line-height: var(--type-h3-lh); }
+h4 { font-family: var(--type-h4-font); font-size: var(--type-h4-size); font-weight: var(--type-h4-weight); line-height: var(--type-h4-lh); }
+p  { font-family: var(--type-body-font); font-size: var(--type-body-size); line-height: var(--type-body-lh); }
+small { font-size: var(--text-sm); color: var(--color-text-muted); }
+code, pre { font-family: var(--font-mono); font-size: var(--type-code-size); }
+a { color: var(--color-text-link); text-decoration: none; }
+a:hover { text-decoration: underline; }

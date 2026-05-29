@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PAREA — Combined Program (AI-first)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #f4f5f7;
+    color: #292929;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .screen-enter { animation: fadeInUp 220ms cubic-bezier(0.4,0,0.2,1) both; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="combined-components.jsx"></script>
+<script type="text/babel" src="combined-screens-1.jsx"></script>
+<script type="text/babel" src="combined-screens-2.jsx"></script>
+<script type="text/babel" src="combined-screens-3.jsx"></script>
+<script type="text/babel">
+
+const { useState, useEffect, useRef } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "uspapStrict": "normal",
+  "accentDark": false,
+  "phaseJump": "p4",
+  "showCohortFeed": true,
+  "aiIntensity": "normal"
+}/*EDITMODE-END*/;
+
+// Routes — Report 1 full arc
+const ROUTES = {
+  'welcome':              { Screen: window.S01_Enrollment,        nav: 'enroll',  label: '01 · Enrollment' },
+  'tech-setup':           { Screen: window.S02_TechSetup,         nav: 'enroll',  label: '02 · Tech Setup' },
+  'home':                 { Screen: window.S03_Dashboard,         nav: 'home',    label: '03 · Dashboard' },
+  'phase-1-intro':        { Screen: window.S04_Phase1Intro,       nav: 'report1', label: '04 · Phase 1 Intro' },
+  'ethics-lesson':        { Screen: window.S05_Ethics,            nav: 'report1', label: '05 · Ethics' },
+  'tool-orientation':     { Screen: window.S06_ToolOrientation,   nav: 'report1', label: '06 · Tool Orientation' },
+  'engagement-letter':    { Screen: window.S07_Engagement,        nav: 'report1', label: '07 · Engagement Letter' },
+  'preliminary-research': { Screen: window.S08_PrelimResearch,    nav: 'report1', label: '08 · Prelim Research' },
+  'inspection-scheduling':{ Screen: window.S09_InspectionScheduling, nav: 'report1', label: '09 · Inspection Sched.' },
+  'mentor-review-1':      { Screen: window.S10_MentorReview1,     nav: 'report1', label: '10 · Mentor Review 1' },
+  'phase-2-launch':       { Screen: window.S12_CaseDrop,          nav: 'report1', label: '11 · Case Drop' },
+  'property-research':    { Screen: window.S13_PropertyResearch,  nav: 'report1', label: '12 · Property Research' },
+  'virtual-inspection':   { Screen: window.S14_VirtualInspection, nav: 'report1', label: '13 · Virtual Inspection' },
+  'gla-measurement':      { Screen: window.S15_GLA,               nav: 'report1', label: '14 · GLA Measurement' },
+  'sketch':               { Screen: window.S16_Sketch,            nav: 'report1', label: '15 · Apex Sketch' },
+  'mentor-review-2':      { Screen: window.S17_MentorReview2,     nav: 'report1', label: '16 · Mentor Review 2' },
+  'market-analysis':      { Screen: window.S18_Market,            nav: 'report1', label: '17 · Market Analysis' },
+  'hbu':                  { Screen: window.S19_HBU,               nav: 'report1', label: '18 · HBU 4-test' },
+  'mentor-review-3':      { Screen: window.S20_MentorReview3,     nav: 'report1', label: '19 · Mentor Review 3' },
+  'comp-selection':       { Screen: window.S21_CompSelection,     nav: 'report1', label: '20 · Comp Selection' },
+  'mentor-review-4':      { Screen: window.S22_MentorReview4,     nav: 'report1', label: '21 · Mentor Review 4' },
+  'adjustment-grid':      { Screen: window.S23_AdjGrid,           nav: 'report1', label: '22 · Adjustment Grid' },
+  'cost-approach':        { Screen: window.S24_Cost,              nav: 'report1', label: '23 · Cost Approach' },
+  'income-approach':      { Screen: window.S25_Income,            nav: 'report1', label: '24 · Income Skip' },
+  'mentor-review-5':      { Screen: window.S26_MR5,               nav: 'report1', label: '25 · Mentor Review 5' },
+  'reconciliation':       { Screen: window.S27_Reconciliation,    nav: 'report1', label: '26 · Reconciliation' },
+  'mentor-review-6':      { Screen: window.S28_MR6,               nav: 'report1', label: '27 · Mentor Review 6' },
+  'report-writing':       { Screen: window.S29_ReportWriting,     nav: 'report1', label: '28 · URAR Drafting' },
+  'workfile':             { Screen: window.S30_Workfile,          nav: 'report1', label: '29 · Workfile' },
+  'mentor-review-7':      { Screen: window.S31_MR7,               nav: 'report1', label: '30 · Mentor Review 7' },
+  'client-sim':           { Screen: window.S32_ClientSim,         nav: 'report1', label: '31 · Client Comm Sim' },
+  'mentor-review-8':      { Screen: window.S33_FinalReview,       nav: 'report1', label: '32 · Final Review' },
+};
+
+const SIDEBAR_GROUPS = [
+  { label: 'Enrollment', items: [
+    ['welcome', 'Enrollment'],
+    ['tech-setup', 'Tech Setup'],
+  ]},
+  { label: 'Cohort 04', items: [
+    ['home', 'Dashboard'],
+  ]},
+  { label: 'Report 1 · Conventional Purchase', items: [
+    ['phase-1-intro', 'Phase 1 · Problem ID', 'p1'],
+    ['ethics-lesson', '— Ethics', 'p1'],
+    ['tool-orientation', '— Tools', 'p1'],
+    ['engagement-letter', '— Engagement letter', 'p1'],
+    ['preliminary-research', '— Prelim research', 'p1'],
+    ['inspection-scheduling', '— Schedule inspection', 'p1'],
+    ['mentor-review-1', '⚑ Mentor Review 1', 'p1'],
+    ['phase-2-launch', 'Phase 2 · Inspection', 'p2'],
+    ['property-research', '— Property research', 'p2'],
+    ['virtual-inspection', '— Virtual inspection', 'p2'],
+    ['gla-measurement', '— GLA measurement', 'p2'],
+    ['sketch', '— Apex sketch', 'p2'],
+    ['mentor-review-2', '⚑ Mentor Review 2', 'p2'],
+    ['market-analysis', 'Phase 3 · Market & HBU', 'p3'],
+    ['hbu', '— HBU 4-test', 'p3'],
+    ['mentor-review-3', '⚑ Mentor Review 3', 'p3'],
+    ['comp-selection', 'Phase 4 · Comp Selection', 'p4'],
+    ['mentor-review-4', '⚑ Mentor Review 4', 'p4'],
+    ['adjustment-grid', 'Phase 5 · Valuation', 'p5'],
+    ['cost-approach', '— Cost approach', 'p5'],
+    ['income-approach', '— Income skip', 'p5'],
+    ['mentor-review-5', '⚑ Mentor Review 5', 'p5'],
+    ['reconciliation', 'Phase 6 · Reconciliation', 'p6'],
+    ['mentor-review-6', '⚑ Mentor Review 6', 'p6'],
+    ['report-writing', 'Phase 7 · Report', 'p7'],
+    ['workfile', '— Workfile', 'p7'],
+    ['mentor-review-7', '⚑ Mentor Review 7', 'p7'],
+    ['client-sim', 'Phase 8 · Client Sim', 'p8'],
+    ['mentor-review-8', '⚑ Final Review', 'p8'],
+  ]},
+];
+
+function PhaseDot({ phase }) {
+  const p = window.PHASES.find(x => x.id === phase);
+  if (!p) return null;
+  return <span style={{ width: 6, height: 6, borderRadius: '50%', background: p.color, marginRight: 8, flexShrink: 0 }}/>;
+}
+
+const SOCRATIC_PROMPTS = {
+  'home':                  { headline: "Pick up where you left off", body: "You're in <strong>Phase 4 · Comp Selection</strong> — the highest-judgment screen in the program. Open it when you have 45 focused minutes. Before you do: which neighborhood factor weighs most in this market?", chips: ['Resume Comp Selection', 'Why this matters'] },
+  'welcome':               { headline: "Why are you here?", body: "Most folks come to PAREA because they can't find a supervisor. Be honest with yourself: do you want a license, or do you want the trade? Your answer changes how hard the next 8 weeks feel.", chips: ['I want the trade', 'I need the license'] },
+  'tech-setup':            { headline: "Tools are a means", body: "PropMix, True Footage, Apex — these don't make you an appraiser. Your <em>judgment</em> does. Each tool will try to give you an answer. Your job is to push back.", chips: ['Got it'] },
+  'phase-1-intro':         { headline: "Problem identification is everything", body: "Most bad reports trace back to a fuzzy problem statement. Before you click into the lessons: what is an appraisal <em>for</em>?", chips: ['Mortgage decision', 'Risk transfer', 'Both'] },
+  'ethics-lesson':         { headline: "Ethics isn't a quiz", body: "USPAP Conduct is the only thing standing between you and a board complaint. The scenarios get harder. Don't memorize — think.", chips: ['Start scenario'] },
+  'tool-orientation':      { headline: "Don't trust the tool", body: "PropMix will hand you 47 comps and rank them. Before you accept its top pick, ask: <strong>does this rank reflect <em>my</em> market or its training data?</strong>", chips: ['Show me an example'] },
+  'engagement-letter':     { headline: "Six scope elements", body: "USPAP requires intended use, user, effective date, type/definition of value, relevant characteristics, and assignment conditions. Miss one and your report has no legal footing.", chips: ['Check my draft', 'Why each one?'] },
+  'preliminary-research':  { headline: "What's your preliminary read?", body: "Based on your desk research, is this market <strong>declining, stable, or increasing</strong>? Back it up with one data point.", chips: ['Increasing — DOM ↓', 'Stable — STL ~100%', 'Declining'] },
+  'inspection-scheduling': { headline: "Plan for what you can't see", body: "Tenant occupancy. Locked outbuildings. Aggressive dog. What's your contingency if you can't access the basement?", chips: ['Note it', 'Reschedule'] },
+  'mentor-review-1':       { headline: "What will James push on?", body: "He sees 1 flag from the pre-screen. Predict the question before he asks it.", chips: ['USPAP edition', 'Scope tightness'] },
+  'phase-2-launch':        { headline: "The case is real", body: "4218 Ridgewood Ln is a 2010 contemporary. Lender wants market value for purchase. The seller's agent will be on-site. What do you bring?", chips: ['Open the case file'] },
+  'property-research':     { headline: "Three sources, one answer", body: "Public record GLA, MLS GLA, and what you measure rarely agree. Which one rules — and why?", chips: ['What I measure', 'It depends'] },
+  'virtual-inspection':    { headline: "Defend your trend call", body: "You noted the neighborhood trend as <em>stable</em>. What MLS data point supports that? If you don't have one yet, we'll get it in Market Analysis — flag it.", chips: ['DOM data', 'STL ratio', 'Flag for later'] },
+  'gla-measurement':       { headline: "ANSI Z765 is the standard", body: "Measure to the exterior. Bay windows count if floor-to-ceiling and ≥ 7'. Open to below doesn't count. Make a habit.", chips: ['Cheatsheet'] },
+  'sketch':                { headline: "The sketch is a legal document", body: "If it disagrees with your narrative, the narrative loses. Re-check perimeter before you save.", chips: ['Recheck', 'Save'] },
+  'mentor-review-2':       { headline: "Defend your GLA", body: "Predict the question: 'You measured 2,184 — assessor says 2,210. Which one goes in the report?'", chips: ['Mine', 'Note both'] },
+  'market-analysis':       { headline: "Trend ≠ vibe", body: "DOM, sale-to-list, inventory months. Pick the two that tell the cleanest story for this market.", chips: ['DOM + STL', 'Inventory + STL'] },
+  'hbu':                   { headline: "All four tests", body: "Legally permissible · physically possible · financially feasible · maximally productive. Skip one and HBU is wrong by definition.", chips: ['Walk me through'] },
+  'mentor-review-3':       { headline: "HBU is where junior appraisers slip", body: "Most argue maximally productive without showing financial feasibility. Don't.", chips: ['Show me an example'] },
+  'comp-selection':        { headline: "Defend C3 over C4", body: "You picked <strong>C1, C2, C3</strong>. C4 has a higher AI score (87) than C3 (78). Walk me through why C3 made the cut over C4.", chips: ['Age + bed/bath match', 'Distance', 'Counter the AI'] },
+  'mentor-review-4':       { headline: "Comp selection = the whole report", body: "If your three comps are wrong, nothing downstream matters. James will spend most of his 20 min here.", chips: ['Run pre-check'] },
+  'adjustment-grid':       { headline: "Net & gross adjustment limits", body: "Net ≤ 15%, gross ≤ 25%. If you bust either, your comp is too dissimilar — or your adjustment is wrong.", chips: ['Show my totals'] },
+  'cost-approach':         { headline: "Marshall & Swift, not your gut", body: "Cost approach is its own discipline. Use the published cost data; show your depreciation math.", chips: ['Pull data'] },
+  'income-approach':       { headline: "It's OK to skip — if you defend it", body: "1-unit residential, owner-occupied market, no rental comps. State why <em>this</em> property doesn't need it.", chips: ['Write the rationale'] },
+  'mentor-review-5':       { headline: "Three approaches, one value", body: "Predict: 'Why did you weight Sales Comparison 100%?'", chips: ['Market evidence', 'Lender expectation'] },
+  'reconciliation':        { headline: "Reconciliation is judgment", body: "Don't average. Defend a single number with the most credible approach.", chips: ['Walk through'] },
+  'mentor-review-6':       { headline: "The number you submit", body: "James will ask 'why $612,500 and not $610,000?' Have an answer that isn't 'it felt right'.", chips: ['Prep answer'] },
+  'report-writing':        { headline: "URAR is form, not formality", body: "Every blank is meaningful. Skip nothing. The narrative tells the story the form can't.", chips: ['Start draft'] },
+  'workfile':              { headline: "5-year workfile retention", body: "Everything you used, every override you rejected, every conversation with this AI. State Board can ask for it.", chips: ['Assemble'] },
+  'mentor-review-7':       { headline: "Final read-through", body: "Read your report aloud. If you stumble, the reader will too.", chips: ['Done reading'] },
+  'client-sim':            { headline: "Client pushback isn't personal", body: "The lender's questions feel adversarial — they're not. Answer with USPAP and data, not defense.", chips: ['Run the sim'] },
+  'mentor-review-8':       { headline: "One report down", body: "Report 1 of 8. The next one is faster. The 8th feels routine. That's the compression curve working.", chips: ['Mark complete'] },
+};
+
+function SocraticPanel({ route, accent, collapsed, onToggle }) {
+  const p = SOCRATIC_PROMPTS[route] || SOCRATIC_PROMPTS['home'];
+  if (collapsed) {
+    return (
+      <aside style={{
+        width: 44, background: 'linear-gradient(180deg, #1a1d2b, #2a1d3a)', flexShrink: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '14px 0', gap: 14,
+        borderLeft: '1px solid #2a2d3b',
+      }}>
+        <button onClick={onToggle} style={{
+          background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: 6,
+        }} title="Open Socratic AI">
+          <i data-lucide="message-square" style={{ width: 18, height: 18 }}></i>
+        </button>
+        <div style={{
+          writingMode: 'vertical-rl', transform: 'rotate(180deg)',
+          fontSize: 10, fontWeight: 800, color: '#cbd0e0', letterSpacing: '.15em', textTransform: 'uppercase',
+          marginTop: 8,
+        }}>Socratic AI</div>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: accent, boxShadow: `0 0 6px ${accent}`, animation: 'pulse 1.6s ease-in-out infinite', marginTop: 'auto', marginBottom: 12 }}/>
+      </aside>
+    );
+  }
+  return (
+    <aside style={{
+      width: 300, background: 'linear-gradient(180deg, #1a1d2b 0%, #2a1d3a 100%)',
+      color: '#fff', flexShrink: 0,
+      display: 'flex', flexDirection: 'column', borderLeft: '1px solid #2a2d3b',
+    }}>
+      <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{
+          width: 28, height: 28, borderRadius: 7, flexShrink: 0,
+          background: `linear-gradient(135deg, ${accent}, #ff5577)`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <i data-lucide="sparkles" style={{ width: 14, height: 14, color: '#fff' }}></i>
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.005em' }}>Socratic AI</div>
+          <div style={{ fontSize: 10, color: '#cbd0e0', letterSpacing: '.04em' }}>Your AI mentor partner</div>
+        </div>
+        <button onClick={onToggle} style={{
+          background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer',
+          color: '#cbd0e0', padding: 5, borderRadius: 5, display: 'flex',
+        }} title="Collapse">
+          <i data-lucide="chevron-right" style={{ width: 13, height: 13 }}></i>
+        </button>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 10px' }}>
+        <div style={{
+          background: `linear-gradient(135deg, ${accent}22, transparent 65%)`,
+          border: `1px solid ${accent}44`,
+          borderRadius: 10, padding: '12px 14px', marginBottom: 14,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: accent, animation: 'pulse 1.6s ease-in-out infinite' }}/>
+            <span style={{ fontSize: 9.5, fontWeight: 800, color: '#ff8da3', letterSpacing: '.1em', textTransform: 'uppercase' }}>Question for you</span>
+          </div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff', lineHeight: 1.35, marginBottom: 8, fontFamily: "'Nunito', sans-serif" }}
+            dangerouslySetInnerHTML={{ __html: p.headline }}/>
+          <div style={{ fontSize: 12, color: '#cbd0e0', lineHeight: 1.55 }}
+            dangerouslySetInnerHTML={{ __html: p.body }}/>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
+          {(p.chips || []).map((c, i) => (
+            <button key={i} style={{
+              background: i === 0 ? 'rgba(214,4,54,0.16)' : 'rgba(255,255,255,0.04)',
+              border: i === 0 ? `1px solid ${accent}88` : '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 7, padding: '9px 11px', textAlign: 'left',
+              color: i === 0 ? '#fff' : '#cbd0e0', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer',
+              fontWeight: i === 0 ? 600 : 500,
+            }}>{c}</button>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 10, fontWeight: 800, color: '#888', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>Recent thinking</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[
+            ['You defended HBU against AI pushback', '2h ago'],
+            ['Comp #4 challenged: 0.6mi too far', '4h ago'],
+            ['Engagement letter approved', 'Yesterday'],
+          ].map(([txt, ts], i) => (
+            <div key={i} style={{
+              display: 'flex', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.03)',
+              borderRadius: 6, fontSize: 11, color: '#cbd0e0', lineHeight: 1.4,
+            }}>
+              <i data-lucide="git-commit-horizontal" style={{ width: 12, height: 12, color: '#888', flexShrink: 0, marginTop: 2 }}></i>
+              <div style={{ flex: 1 }}>
+                <div>{txt}</div>
+                <div style={{ fontSize: 10, color: '#777', marginTop: 1 }}>{ts}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input placeholder="Ask anything…" style={{
+          flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)',
+          color: '#fff', padding: '8px 10px', borderRadius: 6, fontFamily: 'inherit', fontSize: 12,
+          outline: 'none',
+        }}/>
+        <button style={{
+          background: accent, border: 'none', cursor: 'pointer', color: '#fff',
+          width: 32, height: 32, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <i data-lucide="arrow-up" style={{ width: 14, height: 14 }}></i>
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function App() {
+  const [route, setRoute] = useState(() => localStorage.getItem('parea_combined_route') || 'home');
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [socraticCollapsed, setSocraticCollapsed] = useState(() => localStorage.getItem('parea_socratic_collapsed') === '1');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => localStorage.getItem('parea_sidebar_collapsed') === '1');
+  const [screenKey, setScreenKey] = useState(0);
+
+  const toggleSocratic = () => {
+    const next = !socraticCollapsed;
+    setSocraticCollapsed(next);
+    localStorage.setItem('parea_socratic_collapsed', next ? '1' : '0');
+  };
+
+  const toggleSidebar = () => {
+    const next = !sidebarCollapsed;
+    setSidebarCollapsed(next);
+    localStorage.setItem('parea_sidebar_collapsed', next ? '1' : '0');
+  };
+
+  // Listen for tweaks toolbar toggle
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (e.data?.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  useEffect(() => {
+    if (window.lucide) window.lucide.createIcons();
+  });
+
+  const navigate = (to) => {
+    if (!ROUTES[to]) { console.warn('No route:', to); return; }
+    setRoute(to);
+    localStorage.setItem('parea_combined_route', to);
+    setScreenKey(k => k + 1);
+    const main = document.getElementById('main-scroll');
+    if (main) main.scrollTop = 0;
+  };
+
+  const setTweak = (k, v) => {
+    const next = { ...tweaks, [k]: v };
+    setTweaks(next);
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [k]: v } }, '*');
+  };
+
+  const config = ROUTES[route] || ROUTES['home'];
+  const Screen = config.Screen;
+  const accent = tweaks.accentDark ? '#9b0226' : '#d60436';
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', '--accent': accent }}>
+      {/* Sidebar */}
+      <aside style={{
+        width: sidebarCollapsed ? 56 : 256,
+        background: '#fff', borderRight: '1px solid #e8e8e8',
+        display: 'flex', flexDirection: 'column', flexShrink: 0,
+        transition: 'width 200ms ease',
+      }}>
+        <div style={{
+          padding: sidebarCollapsed ? '14px 8px' : '16px 18px',
+          borderBottom: '1px solid #f0f0f0',
+          display: 'flex', alignItems: 'center', gap: 10,
+          justifyContent: sidebarCollapsed ? 'center' : 'space-between',
+        }}>
+          {!sidebarCollapsed && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: `linear-gradient(135deg, ${accent}, #ff5577)`,
+                color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontWeight: 800, fontSize: 14, fontFamily: "'Nunito', sans-serif", flexShrink: 0,
+              }}>P</div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 13.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.01em' }}>PAREA</div>
+                <div style={{ fontSize: 10, color: '#888', letterSpacing: '.06em', textTransform: 'uppercase', fontWeight: 700 }}>AI-First Program</div>
+              </div>
+            </div>
+          )}
+          <button onClick={toggleSidebar} title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} style={{
+            background: '#f4f5f7', border: 'none', cursor: 'pointer',
+            width: 28, height: 28, borderRadius: 6, display: 'flex',
+            alignItems: 'center', justifyContent: 'center', color: '#666', flexShrink: 0,
+          }}>
+            <i data-lucide={sidebarCollapsed ? 'panel-left-open' : 'panel-left-close'} style={{ width: 14, height: 14 }}></i>
+          </button>
+        </div>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '14px 0' }}>
+          {SIDEBAR_GROUPS.map((g, gi) => (
+            <div key={gi} style={{ marginBottom: 14 }}>
+              {!sidebarCollapsed && (
+                <div style={{ fontSize: 9.5, fontWeight: 800, color: '#aaa', letterSpacing: '.08em', textTransform: 'uppercase', padding: '0 18px 6px' }}>{g.label}</div>
+              )}
+              {sidebarCollapsed && gi > 0 && (
+                <div style={{ margin: '4px 12px 8px', height: 1, background: '#f0f0f0' }}/>
+              )}
+              {g.items.map(([r, label, phase], i) => {
+                const active = route === r;
+                return (
+                  <button key={r} onClick={() => navigate(r)} title={sidebarCollapsed ? `${g.label} — ${label}` : ''} style={{
+                    width: '100%',
+                    padding: sidebarCollapsed ? '7px 0' : '7px 14px 7px 18px',
+                    background: active ? '#fff0f3' : 'none',
+                    border: 'none',
+                    borderLeft: active ? `3px solid ${accent}` : '3px solid transparent',
+                    color: active ? accent : '#444',
+                    fontFamily: 'inherit', fontSize: 12.5, fontWeight: active ? 700 : 500,
+                    textAlign: 'left', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center',
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                  }}>
+                    {sidebarCollapsed ? (
+                      <span style={{
+                        width: 8, height: 8, borderRadius: '50%',
+                        background: phase ? (PHASES.find(x => x.id === phase)?.color || '#aaa') : '#aaa',
+                        opacity: active ? 1 : 0.55,
+                      }}/>
+                    ) : (
+                      <>
+                        {phase && <PhaseDot phase={phase}/>}
+                        {label}
+                      </>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </aside>
+
+      {/* Main */}
+      <main id="main-scroll" style={{ flex: 1, overflowY: 'auto', background: '#f4f5f7', position: 'relative' }}>
+        {/* Top-right user pill */}
+        <div style={{
+          position: 'absolute', top: 16, right: 24, zIndex: 50,
+          display: 'flex', alignItems: 'center', gap: 10,
+          background: '#fff', padding: '6px 12px 6px 6px', borderRadius: 999,
+          border: '1px solid #e8e8e8', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        }}>
+          <img src={"https://i.pravatar.cc/64?img=32"} style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover' }}/>
+          <div style={{ lineHeight: 1.2 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, color: '#292929' }}>Sarah Henderson</div>
+            <div style={{ fontSize: 10, color: '#888' }}>Cohort 04 · Day 87</div>
+          </div>
+          <button title="Notifications" style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+            color: '#666', display: 'flex',
+          }}>
+            <i data-lucide="bell" style={{ width: 14, height: 14 }}></i>
+          </button>
+        </div>
+
+        <div className="screen-enter" key={screenKey} style={{ padding: '22px 26px 60px' }}>
+          {Screen ? <Screen navigate={navigate} tweaks={tweaks}/> : <div>Screen not found</div>}
+        </div>
+      </main>
+
+      {/* Persistent Socratic AI panel */}
+      <SocraticPanel route={route} accent={accent} collapsed={socraticCollapsed} onToggle={toggleSocratic}/>
+
+      {/* Tweaks panel */}
+      {tweaksOpen && (
+        <div style={{
+          position: 'fixed', right: 18, bottom: 18, width: 280,
+          background: '#fff', borderRadius: 12, border: '1px solid #e8e8e8',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.15)', zIndex: 100,
+          padding: 16, fontSize: 12.5,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div style={{ fontSize: 13, fontWeight: 800, fontFamily: "'Nunito', sans-serif" }}>Tweaks</div>
+            <button onClick={() => { setTweaksOpen(false); window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#888', padding: 4 }}>✕</button>
+          </div>
+
+          <TweakRow label="USPAP scanner strictness">
+            <div style={{ display: 'flex', gap: 4, background: '#f4f5f7', padding: 3, borderRadius: 6 }}>
+              {['gentle','normal','strict'].map(v => (
+                <button key={v} onClick={() => setTweak('uspapStrict', v)} style={{
+                  flex: 1, padding: '5px 6px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 11,
+                  background: tweaks.uspapStrict === v ? '#fff' : 'transparent',
+                  color: tweaks.uspapStrict === v ? accent : '#666',
+                  fontWeight: tweaks.uspapStrict === v ? 700 : 500,
+                  borderRadius: 4, boxShadow: tweaks.uspapStrict === v ? '0 1px 2px rgba(0,0,0,0.08)' : 'none',
+                  textTransform: 'capitalize',
+                }}>{v}</button>
+              ))}
+            </div>
+          </TweakRow>
+
+          <TweakRow label="AI Socratic intensity">
+            <div style={{ display: 'flex', gap: 4, background: '#f4f5f7', padding: 3, borderRadius: 6 }}>
+              {['gentle','normal','aggressive'].map(v => (
+                <button key={v} onClick={() => setTweak('aiIntensity', v)} style={{
+                  flex: 1, padding: '5px 4px', border: 'none', cursor: 'pointer', fontFamily: 'inherit', fontSize: 10.5,
+                  background: tweaks.aiIntensity === v ? '#fff' : 'transparent',
+                  color: tweaks.aiIntensity === v ? accent : '#666',
+                  fontWeight: tweaks.aiIntensity === v ? 700 : 500,
+                  borderRadius: 4, textTransform: 'capitalize',
+                }}>{v}</button>
+              ))}
+            </div>
+          </TweakRow>
+
+          <TweakRow label="Phase progress (jump cohort)">
+            <select value={tweaks.phaseJump} onChange={e => setTweak('phaseJump', e.target.value)}
+              style={{ width: '100%', padding: '6px 8px', border: '1px solid #e0e0e0', borderRadius: 6, fontFamily: 'inherit', fontSize: 12 }}>
+              {(window.PHASES || []).slice(1).map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+            </select>
+          </TweakRow>
+
+          <TweakRow label="Show cohort feed">
+            <Toggle on={tweaks.showCohortFeed} onClick={() => setTweak('showCohortFeed', !tweaks.showCohortFeed)} accent={accent}/>
+          </TweakRow>
+
+          <TweakRow label="Dark accent on brand red">
+            <Toggle on={tweaks.accentDark} onClick={() => setTweak('accentDark', !tweaks.accentDark)} accent={accent}/>
+          </TweakRow>
+
+          <div style={{ marginTop: 8, fontSize: 10.5, color: '#888', borderTop: '1px solid #f0f0f0', paddingTop: 10 }}>
+            5 tweaks · changes persist to file
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TweakRow({ label, children }) {
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <div style={{ fontSize: 10.5, fontWeight: 700, color: '#666', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 5 }}>{label}</div>
+      {children}
+    </div>
+  );
+}
+function Toggle({ on, onClick, accent }) {
+  return (
+    <button onClick={onClick} style={{
+      width: 38, height: 22, borderRadius: 11, border: 'none', cursor: 'pointer',
+      background: on ? accent : '#ccc', position: 'relative', transition: 'background 150ms',
+    }}>
+      <span style={{
+        position: 'absolute', top: 2, left: on ? 18 : 2, width: 18, height: 18,
+        borderRadius: '50%', background: '#fff', transition: 'left 150ms',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+      }}/>
+    </button>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>McKissock — PAREA LMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #f4f5f7;
+    color: #292929;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .screen-enter {
+    animation: fadeInUp 220ms cubic-bezier(0.4,0,0.2,1) both;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="components.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+<script type="text/babel">
+
+const { useState, useEffect, useRef } = React;
+
+const ROUTES = {
+  'home':             { nav: 'home',     Screen: Screen1_Dashboard },
+  'case-launch':      { nav: 'cases',    Screen: Screen2_CaseLaunch },
+  'case-intro':       { nav: 'cases',    Screen: Screen3_CaseIntro },
+  'step-1':           { nav: 'cases',    Screen: Screen4_DataCollection },
+  'step-2':           { nav: 'cases',    Screen: Screen5_VisualInspection },
+  'step-3':           { nav: 'cases',    Screen: Screen6_AppraisalReport },
+  'submitted':        { nav: 'cases',    Screen: Screen7_Submitted },
+  'step-4':           { nav: 'cases',    Screen: Screen8_PeerReview },
+  'step-5':           { nav: 'cases',    Screen: Screen9_DiscussionForum },
+  'case-complete':    { nav: 'cases',    Screen: Screen10_CaseComplete },
+  'mentor-feedback':  { nav: 'mentor',   Screen: Screen11_MentorFeedback },
+  'schedule-meeting': { nav: 'schedule', Screen: Screen12_ScheduleMeeting },
+  'virtual-meeting':  { nav: 'schedule', Screen: Screen13_VirtualMeeting },
+  'field-visit':      { nav: 'courses',  Screen: Screen14_FieldVisit },
+};
+
+const SCREEN_LABELS = [
+  { label: 'Dashboard',        route: 'home' },
+  { label: 'Case Launch',      route: 'case-launch' },
+  { label: 'Introduction',     route: 'case-intro' },
+  { label: 'Data Collection',  route: 'step-1' },
+  { label: 'Inspection',       route: 'step-2' },
+  { label: 'Report',           route: 'step-3' },
+  { label: 'Submitted',        route: 'submitted' },
+  { label: 'Peer Review',      route: 'step-4' },
+  { label: 'Forum',            route: 'step-5' },
+  { label: 'Case Complete',    route: 'case-complete' },
+  { label: 'Mentor Feedback',  route: 'mentor-feedback' },
+  { label: 'Sched. Meeting',   route: 'schedule-meeting' },
+  { label: 'Virtual Meeting',  route: 'virtual-meeting' },
+  { label: 'Field Visit',      route: 'field-visit' },
+];
+
+function App() {
+  const [route, setRoute] = useState(() => localStorage.getItem('parea_route') || 'home');
+  const [collapsed, setCollapsed] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [screenKey, setScreenKey] = useState(0);
+
+  const navigate = (to) => {
+    setRoute(to);
+    localStorage.setItem('parea_route', to);
+    setScreenKey(k => k + 1);
+    const main = document.getElementById('main-scroll');
+    if (main) main.scrollTop = 0;
+  };
+
+  const showToast = (msg) => setToast(msg);
+
+  const config = ROUTES[route] || ROUTES['home'];
+  const { Screen, nav } = config;
+  const isVideoScreen = route === 'virtual-meeting';
+
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', flexDirection: 'column' }}>
+      <TopBar onMenuToggle={() => setCollapsed(c => !c)} collapsed={collapsed} />
+
+      {/* Screen selector strip */}
+      <div style={{
+        background: '#fff', borderBottom: '1px solid #e8e8e8',
+        padding: '0 12px', display: 'flex', alignItems: 'center', gap: 0,
+        overflowX: 'auto', flexShrink: 0, minHeight: 38,
+      }}>
+        <span style={{
+          fontSize: 10, fontWeight: 700, color: '#aaa', textTransform: 'uppercase',
+          letterSpacing: '.07em', paddingRight: 10, flexShrink: 0, whiteSpace: 'nowrap',
+        }}>Screens:</span>
+        {SCREEN_LABELS.map((item, i) => {
+          const active = route === item.route;
+          return (
+            <button key={item.route} onClick={() => navigate(item.route)} style={{
+              padding: '7px 10px', fontSize: 11, fontWeight: active ? 700 : 400,
+              color: active ? '#d60436' : '#666', background: 'none', border: 'none',
+              cursor: 'pointer',
+              borderBottom: active ? '2px solid #d60436' : '2px solid transparent',
+              whiteSpace: 'nowrap', transition: 'all 120ms', flexShrink: 0,
+            }}>
+              {i + 1}. {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Body */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        <Sidebar
+          active={nav}
+          onNav={(id) => {
+            const navRoutes = {
+              home: 'home',
+              courses: 'case-intro',
+              cases: 'case-launch',
+              mentor: 'mentor-feedback',
+              discussion: 'step-5',
+              progress: 'case-complete',
+              schedule: 'schedule-meeting',
+              announce: 'home',
+            };
+            navigate(navRoutes[id] || 'home');
+          }}
+          collapsed={collapsed}
+        />
+
+        <main id="main-scroll" style={{
+          flex: 1, overflow: 'auto',
+          padding: isVideoScreen ? 20 : '28px 32px',
+          background: '#f4f5f7',
+        }}>
+          <div key={screenKey} className="screen-enter">
+            <Screen navigate={navigate} showToast={showToast} />
+          </div>
+        </main>
+      </div>
+
+      {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
