@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.env.local
+FakeTrueFootage/
+fake_apexsketch/
+fake_matterport/
+fake_mls/
