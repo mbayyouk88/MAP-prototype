@@ -2,11 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import logoSrc from './assets/logo.png';
 import MLSTool from './tools/MLSTool';
-import VistaTool from './tools/VistaTool';
-import SketchTool from './tools/SketchTool';
+import InspectionTool from './tools/InspectionTool';
 import ReportTool from './tools/ReportTool';
 
-const FULL_HEIGHT_ROUTES = ['vista', 'urar-report'];
+const FULL_HEIGHT_ROUTES = ['inspection', 'urar-report'];
 import {
   C, Icon, Button, Badge, Avatar, Card, CardSection, StepTracker, CheckItem,
   Textarea, Input, Toast, PageHeader, ToolCard,
@@ -101,8 +100,7 @@ const PAREA_NAV = [
   { id: 'divider2', divider: true },
   { id: 'tools-label', sectionLabel: 'Tools' },
   { id: 'mls', icon: 'building-2', label: 'MLS Search', route: 'mls' },
-  { id: 'vista-tool', icon: 'scan-eye', label: 'VISTA Inspector', route: 'vista' },
-  { id: 'apex-sketch', icon: 'pencil-ruler', label: 'ApexSketch', route: 'apex-sketch' },
+  { id: 'inspection', icon: 'scan-eye', label: 'Inspect & Sketch', route: 'inspection' },
   { id: 'urar-report', icon: 'clipboard-list', label: 'URAR Report', route: 'urar-report' },
 ];
 
@@ -667,8 +665,7 @@ function renderScreen(route, navigate, tweaks) {
     case 'office-hours': return <S_OfficeHours {...p} />;
     case 'workfile': return <S30b_Workfile {...p} />;
     case 'mls': return <MLSTool />;
-    case 'vista': return <VistaTool />;
-    case 'apex-sketch': return <SketchTool />;
+    case 'inspection': return <InspectionTool />;
     case 'urar-report': return <ReportTool />;
     default: return <S03_Dashboard {...p} />;
   }
