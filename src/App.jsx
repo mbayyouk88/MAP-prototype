@@ -1141,85 +1141,30 @@ const PM_TOOL_META = {
 };
 
 function PracticeModuleFullLayout({ module, route, navigate }) {
-  const isExp = route?.endsWith('-b');
-  const modIdx = PRACTICE_MODULES.findIndex(m => m.id === module.id);
-  const prev = modIdx > 0 ? PRACTICE_MODULES[modIdx - 1] : null;
-  const next = modIdx < PRACTICE_MODULES.length - 1 ? PRACTICE_MODULES[modIdx + 1] : null;
-
-  const instExpTab = (active, label, icon, onClick) => (
-    <button onClick={onClick} style={{
-      display: 'flex', alignItems: 'center', gap: 7, padding: '7px 14px',
-      borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
-      fontSize: 12.5, fontWeight: active ? 700 : 400,
-      background: active ? '#fff' : 'transparent', color: active ? '#292929' : '#888',
-      boxShadow: active ? '0 1px 4px rgba(0,0,0,0.10)' : 'none',
-    }}>
-      <Icon name={icon} size={13} color={active ? '#d60436' : '#aaa'} />
-      {label}
-    </button>
-  );
-
-  const toolPanel = (toolKey) => {
-    const meta = PM_TOOL_META[toolKey];
-    const activity = module.toolActivities?.[toolKey];
-    return (
-      <div key={toolKey} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: toolKey !== module.tools[module.tools.length - 1] ? '1px solid #e8e8e8' : 'none' }}>
-        <div style={{ padding: '9px 16px', background: '#fafafa', borderBottom: '1px solid #e8e8e8', flexShrink: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: activity ? 4 : 0 }}>
-            <Icon name={meta.icon} size={13} color="#555" />
-            <span style={{ fontSize: 12.5, fontWeight: 700, color: '#292929' }}>{meta.label}</span>
-          </div>
-          {activity && <p style={{ fontSize: 11.5, color: '#666', margin: 0, lineHeight: 1.55 }}>{activity}</p>}
-        </div>
-        <div style={{ flex: 1, overflow: meta.overflow }}>
-          {toolKey === 'mls'         && <MLSTool />}
-          {toolKey === 'inspection'  && <InspectionTool />}
-          {toolKey === 'urar-report' && <ReportTool />}
-        </div>
-      </div>
-    );
-  };
+  // Determine which tool to show from the route suffix
+  const suffix = route?.split('-').pop(); // 'a', 'b', etc.
+  const toolIdx = suffix === 'a' ? 0 : suffix === 'b' && module.tools.length > 1 ? 1 : 0;
+  const activeTool = module.tools[toolIdx];
+  const meta = PM_TOOL_META[activeTool];
+  const activity = module.toolActivities?.[activeTool];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* Compact module header */}
-      <div style={{ padding: '12px 24px 10px', borderBottom: '1px solid #e8e8e8', background: '#fff', flexShrink: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Badge>Module {module.id} of 9</Badge>
-            <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: 15, fontWeight: 800, color: '#292929' }}>{module.title}</span>
-          </div>
-          <div style={{ display: 'flex', gap: 5 }}>
-            {prev && <button onClick={() => navigate(prev.route)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', color: '#555', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer' }}><Icon name="chevron-left" size={12} color="#555" />M{prev.id}</button>}
-            {next && <button onClick={() => navigate(next.route)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', color: '#555', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer' }}>M{next.id}<Icon name="chevron-right" size={12} color="#555" /></button>}
-          </div>
+      {/* Slim activity header */}
+      <div style={{ padding: '10px 20px', borderBottom: '1px solid #e8e8e8', background: '#fafafa', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: activity ? 3 : 0 }}>
+          <Badge>M{module.id}</Badge>
+          <Icon name={meta.icon} size={13} color="#555" />
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#292929' }}>{meta.label}</span>
         </div>
-        <div style={{ display: 'flex', gap: 3, background: '#f0f1f3', borderRadius: 8, padding: 3, width: 'fit-content' }}>
-          {instExpTab(!isExp, 'Instructional', 'monitor', () => navigate(module.route + '-a'))}
-          {instExpTab(isExp,  'Experiential',  'map-pin',  () => navigate(module.route + '-b'))}
-        </div>
+        {activity && <p style={{ fontSize: 12, color: '#666', margin: 0, lineHeight: 1.5, maxWidth: 780 }}>{activity}</p>}
       </div>
-
-      {isExp ? (
-        <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px 60px' }}>
-          <Card padding={22}>
-            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #1a9e5c, #2fd88a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <Icon name="map-pin" size={17} color="#fff" />
-              </div>
-              <div>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>Your assignment</div>
-                <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.7, margin: 0 }}>{module.experiential}</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      ) : (
-        /* All tools visible side by side — no tab switching needed */
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-          {module.tools.map(t => toolPanel(t))}
-        </div>
-      )}
+      {/* One tool fills the remaining height */}
+      <div style={{ flex: 1, overflow: meta.overflow }}>
+        {activeTool === 'mls'          && <MLSTool />}
+        {activeTool === 'inspection'   && <InspectionTool />}
+        {activeTool === 'urar-report'  && <ReportTool />}
+      </div>
     </div>
   );
 }
