@@ -267,17 +267,39 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
 
   if (collapsed) {
     return (
-      <aside className={shake ? 'socratic-attention' : ''} style={{
-        width: 44, flexShrink: 0,
-        background: 'linear-gradient(180deg, #1a1d2b, #2a1d3a)',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        padding: '14px 0', gap: 14, borderLeft: '1px solid #2a2d3b',
-      }}>
-        <button onClick={onToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: 6 }} title="Open Socratic AI">
-          <Icon name="message-square" size={18} color="#fff" />
-        </button>
-        <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 10, fontWeight: 800, color: '#cbd0e0', letterSpacing: '.15em', textTransform: 'uppercase', marginTop: 8 }}>Socratic AI</div>
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: accent, boxShadow: `0 0 6px ${accent}`, animation: 'pulse 1.6s ease-in-out infinite', marginTop: 'auto', marginBottom: 12 }} />
+      <aside className={shake ? 'socratic-attention' : ''} onClick={onToggle}
+        title="Open Socratic AI"
+        style={{
+          width: 44, flexShrink: 0, cursor: 'pointer',
+          background: 'linear-gradient(180deg, #1a1d2b, #2a1d3a)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderLeft: '1px solid #2a2d3b',
+        }}>
+        <div style={{
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+          padding: '14px 6px', borderRadius: 10,
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.09)',
+        }}>
+          <div style={{
+            width: 30, height: 30, borderRadius: 8,
+            background: `linear-gradient(135deg, ${accent}, #ff5577)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: `0 0 14px ${accent}55`,
+          }}>
+            <Icon name="sparkles" size={14} color="#fff" />
+          </div>
+          <div style={{
+            writingMode: 'vertical-rl', transform: 'rotate(180deg)',
+            fontSize: 9, fontWeight: 800, color: '#ff8da3',
+            letterSpacing: '.12em', textTransform: 'uppercase',
+          }}>Socratic AI</div>
+          <span style={{
+            width: 7, height: 7, borderRadius: '50%',
+            background: accent, boxShadow: `0 0 8px ${accent}`,
+            animation: 'pulse 1.6s ease-in-out infinite',
+          }} />
+        </div>
       </aside>
     );
   }
@@ -817,56 +839,99 @@ const PRACTICE_MODULES = [
 
 const TOOL_LABELS = { mls: 'McKissock MLS', inspection: 'McKissock Inspect', 'urar-report': 'McKissock UAD' };
 
-function PracticeModuleScreen({ module, navigate }) {
+function PracticeModuleScreen({ module, route, navigate }) {
+  const isExp = route?.endsWith('-b');
+  const modIdx = PRACTICE_MODULES.findIndex(m => m.id === module.id);
+  const prev = modIdx > 0 ? PRACTICE_MODULES[modIdx - 1] : null;
+  const next = modIdx < PRACTICE_MODULES.length - 1 ? PRACTICE_MODULES[modIdx + 1] : null;
+
+  const tabBtn = (active, label, icon, onClick) => (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 7, padding: '7px 14px',
+      borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+      fontSize: 12.5, fontWeight: active ? 700 : 400,
+      background: active ? '#fff' : 'transparent',
+      color: active ? '#292929' : '#888',
+      boxShadow: active ? '0 1px 4px rgba(0,0,0,0.10)' : 'none',
+      transition: 'all 140ms',
+    }}>
+      <Icon name={icon} size={13} color={active ? '#d60436' : '#aaa'} />
+      {label}
+    </button>
+  );
+
+  const navBtn = (label, onClick) => (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 5, padding: '5px 12px',
+      borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff',
+      color: '#555', fontFamily: 'inherit', fontSize: 12, cursor: 'pointer',
+    }}>{label}</button>
+  );
+
   return (
     <div style={{ maxWidth: 840, margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-        <Badge>Module {module.id} of 9</Badge>
-        <Badge color="warning">In development</Badge>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Badge>Module {module.id} of 9</Badge>
+          <Badge color="warning">In development</Badge>
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {prev && navBtn(<><Icon name="chevron-left" size={12} color="#555" /> M{prev.id}</>, () => navigate(prev.route))}
+          {next && navBtn(<>M{next.id} <Icon name="chevron-right" size={12} color="#555" /></>, () => navigate(next.route))}
+        </div>
       </div>
-      <h1 style={{ fontFamily: "'Nunito', sans-serif", fontSize: 24, fontWeight: 800, color: '#292929', margin: '8px 0 4px' }}>{module.title}</h1>
-      <p style={{ fontSize: 12.5, color: '#888', marginBottom: 22, lineHeight: 1.5 }}>4 properties: {PRACTICE_PROPERTIES}</p>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <Card padding={20}>
+      <h1 style={{ fontFamily: "'Nunito', sans-serif", fontSize: 24, fontWeight: 800, color: '#292929', margin: '8px 0 4px' }}>{module.title}</h1>
+      <p style={{ fontSize: 12.5, color: '#888', marginBottom: 16, lineHeight: 1.5 }}>4 properties: {PRACTICE_PROPERTIES}</p>
+
+      <div style={{ display: 'flex', gap: 3, background: '#f0f1f3', borderRadius: 9, padding: 4, marginBottom: 18, width: 'fit-content' }}>
+        {tabBtn(!isExp, 'Instructional', 'monitor', () => navigate(module.route + '-a'))}
+        {tabBtn(isExp,  'Experiential',  'map-pin',  () => navigate(module.route + '-b'))}
+      </div>
+
+      {!isExp ? (
+        <Card padding={22}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
             <div style={{ width: 36, height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #d60436, #ff5577)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Icon name="monitor" size={17} color="#fff" />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 6 }}>Instructional</div>
-              <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.65, margin: 0 }}>{module.instructional}</p>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>What you'll do</div>
+              <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.7, margin: '0 0 14px' }}>{module.instructional}</p>
               {module.tools.length > 0 && (
-                <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
-                  {module.tools.map(t => (
-                    <button key={t} onClick={() => navigate(t)}
-                      style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 13px', borderRadius: 7, border: '1.5px solid #d60436', background: '#fff0f3', color: '#d60436', fontFamily: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                      <Icon name="external-link" size={12} color="#d60436" />
-                      {TOOL_LABELS[t]}
-                    </button>
-                  ))}
+                <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: 12 }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: '#aaa', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>Tools used in this module</div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {module.tools.map(t => (
+                      <button key={t} onClick={() => navigate(t)}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 13px', borderRadius: 7, border: '1.5px solid #d60436', background: '#fff0f3', color: '#d60436', fontFamily: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                        <Icon name="external-link" size={12} color="#d60436" />
+                        {TOOL_LABELS[t]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </Card>
-
-        <Card padding={20}>
+      ) : (
+        <Card padding={22}>
           <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
             <div style={{ width: 36, height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #1a9e5c, #2fd88a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <Icon name="map-pin" size={17} color="#fff" />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 6 }}>Experiential</div>
-              <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.65, margin: 0 }}>{module.experiential}</p>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>Your assignment</div>
+              <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.7, margin: 0 }}>{module.experiential}</p>
             </div>
           </div>
         </Card>
-      </div>
+      )}
 
       <div style={{ marginTop: 14, background: '#fff8ec', border: '1px solid #f5cfa0', borderRadius: 10, padding: '11px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
         <Icon name="hammer" size={14} color="#e8860a" />
-        <div style={{ fontSize: 12.5, color: '#7a4a00' }}>Interactive lessons for this module are still being built. Check back soon.</div>
+        <div style={{ fontSize: 12.5, color: '#7a4a00' }}>Interactive lessons are still being built. Check back soon.</div>
       </div>
     </div>
   );
@@ -892,7 +957,7 @@ function S_ReportPlaceholder({ number, navigate }) {
 
 // ── Route → Screen ────────────────────────────────────────────────
 function renderScreen(route, navigate, tweaks) {
-  const p = { navigate, tweaks };
+  const p = { navigate, tweaks, route };
   switch (route) {
     case 'before-you-start': return <S00_BeforeYouStart {...p} />;
     case 'welcome': return <S01_Enrollment {...p} />;
@@ -950,6 +1015,69 @@ function renderScreen(route, navigate, tweaks) {
 }
 
 // ── Root App ──────────────────────────────────────────────────────
+// ── Step tool bar ─────────────────────────────────────────────────
+const STEP_TOOLS = {
+  'phase-2-launch':    ['mls','inspection'],
+  'property-research': ['mls','inspection'],
+  'virtual-inspection':['mls','inspection'],
+  'gla-measurement':   ['mls','inspection'],
+  'sketch':            ['mls','inspection'],
+  'mentor-review-2':   ['mls','inspection'],
+  'market-analysis':   ['mls'],
+  'hbu':               ['mls'],
+  'mentor-review-3':   ['mls'],
+  'comp-selection':    ['mls'],
+  'mentor-review-4':   ['mls'],
+  'adjustment-grid':   ['urar-report'],
+  'valuation':         ['urar-report'],
+  'mentor-review-5':   ['urar-report'],
+  'reconciliation':    ['urar-report'],
+  'mentor-review-6':   ['urar-report'],
+  'report-writing':    ['urar-report'],
+  'uspap-checklist':   ['urar-report'],
+  'mentor-review-7':   ['urar-report'],
+  'capstone':          ['workfile'],
+  'mentor-review-8':   ['workfile'],
+};
+
+const STEP_TOOL_META = {
+  mls:         { icon: 'building-2',    label: 'McKissock MLS',     route: 'mls' },
+  inspection:  { icon: 'scan-eye',      label: 'McKissock Inspect', route: 'inspection' },
+  'urar-report':{ icon: 'clipboard-list',label: 'McKissock UAD',    route: 'urar-report' },
+  workfile:    { icon: 'folder-open',   label: 'Workfile',          route: 'workfile' },
+};
+
+function StepToolsBar({ tools, navigate }) {
+  return (
+    <div style={{
+      borderBottom: '1px solid #e8e8e8', background: '#fafafa',
+      padding: '8px 28px', display: 'flex', alignItems: 'center', gap: 10,
+      flexShrink: 0,
+    }}>
+      <span style={{ fontSize: 10.5, fontWeight: 700, color: '#aaa', textTransform: 'uppercase', letterSpacing: '.07em', marginRight: 4 }}>Tools</span>
+      {tools.map(t => {
+        const m = STEP_TOOL_META[t];
+        return (
+          <button key={t} onClick={() => navigate(m.route)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 6,
+              padding: '4px 12px', borderRadius: 6,
+              border: '1px solid #e0e0e0', background: '#fff',
+              color: '#333', fontFamily: 'inherit', fontSize: 12, fontWeight: 500,
+              cursor: 'pointer', transition: 'border-color 120ms, background 120ms',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#d60436'; e.currentTarget.style.color = '#d60436'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.color = '#333'; }}
+          >
+            <Icon name={m.icon} size={13} color="inherit" />
+            {m.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function App() {
   const [route, setRoute] = useState(() => {
     try {
@@ -982,6 +1110,7 @@ export default function App() {
       <PAREASidebar active={route} onNav={navigate} collapsed={sidebarCollapsed} />
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <AppTopBar onMenuToggle={() => setSidebarCollapsed(c => !c)} collapsed={sidebarCollapsed} />
+        {STEP_TOOLS[route] && <StepToolsBar tools={STEP_TOOLS[route]} navigate={navigate} />}
         <div style={{ flex: 1, overflow: isFull ? 'hidden' : 'auto', padding: isFull ? 0 : '24px 28px 80px' }}>
           <div key={screenKey} className={isFull ? undefined : 'screen-enter'} style={isFull ? { height: '100%' } : undefined}>
             {renderScreen(route, navigate, tweaks)}
