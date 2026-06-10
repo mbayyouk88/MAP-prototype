@@ -23,122 +23,117 @@ import {
 } from './allTheThings';
 
 // ── PAREA Sidebar navigation ──────────────────────────────────────
+const REPORT_1_ROUTES = new Set([
+  'phase-1-intro','ethics-lesson','tool-orientation','engagement-letter','preliminary-research','inspection-scheduling','mentor-review-1',
+  'phase-2-launch','property-research','virtual-inspection','gla-measurement','sketch','mentor-review-2',
+  'market-analysis','hbu','mentor-review-3',
+  'comp-selection','mentor-review-4',
+  'adjustment-grid','valuation','mentor-review-5',
+  'reconciliation','mentor-review-6',
+  'report-writing','uspap-checklist','mentor-review-7',
+  'capstone','mentor-review-8',
+]);
+
 const PAREA_NAV = [
-  { id: 'home', icon: 'layout-dashboard', label: 'Dashboard', route: 'home' },
-  { id: 'step0', icon: 'sparkles', label: 'Before You Start', route: 'before-you-start' },
-  { id: 'enroll', icon: 'user-plus', label: 'Enrollment', route: 'welcome' },
-  { id: 'select-region', icon: 'map', label: 'Select Region', route: 'select-region' },
+  // ── Group 0 ──────────────────────────────────────────────────────
+  { id: 'home',          icon: 'layout-dashboard', label: 'Dashboard',      route: 'home' },
+  { id: 'mentors-corner',icon: 'video',            label: "Mentor's Corner", route: 'mentors-corner' },
+  { id: 'office-hours',  icon: 'calendar-days',    label: 'Office Hours',   route: 'office-hours' },
+  { id: 'workfile',      icon: 'folder-open',       label: 'Workfile',       route: 'workfile' },
+
+  // ── Introduction ─────────────────────────────────────────────────
+  { id: 'div-intro', divider: true },
+  { id: 'sec-intro', sectionLabel: 'Introduction', sectionIcon: 'compass' },
+  { id: 'step0',       icon: 'sparkles',    label: 'Before You Start', route: 'before-you-start' },
+  { id: 'enroll',      icon: 'user-plus',   label: 'Enrollment',       route: 'welcome' },
+  { id: 'select-region',icon: 'map',        label: 'Select Region',    route: 'select-region' },
+  { id: 'tech-setup',  icon: 'settings-2',  label: 'Tech Setup',       route: 'tech-setup' },
+
+  // ── Practice ─────────────────────────────────────────────────────
+  { id: 'div-practice', divider: true },
+  { id: 'sec-practice', sectionLabel: 'Practice', sectionIcon: 'dumbbell' },
+  { id: 'pr-m1', icon: 'target',         label: 'M1 · Problem ID',       route: 'pr-m1', sub: [{ route: 'pr-m1-a', label: 'a · Instructional' }, { route: 'pr-m1-b', label: 'b · Experiential' }] },
+  { id: 'pr-m2', icon: 'layers',         label: 'M2 · Scope of Work',    route: 'pr-m2', sub: [{ route: 'pr-m2-a', label: 'a · Instructional' }, { route: 'pr-m2-b', label: 'b · Experiential' }] },
+  { id: 'pr-m3', icon: 'database',       label: 'M3 · Data Collection',  route: 'pr-m3', sub: [{ route: 'pr-m3-a', label: 'a · Instructional' }, { route: 'pr-m3-b', label: 'b · Experiential' }] },
+  { id: 'pr-m4', icon: 'building-2',     label: 'M4 · HBU',              route: 'pr-m4', sub: [{ route: 'pr-m4-a', label: 'a · Instructional' }, { route: 'pr-m4-b', label: 'b · Experiential' }] },
+  { id: 'pr-m5', icon: 'bar-chart-2',    label: 'M5 · Sales Comparison', route: 'pr-m5', sub: [{ route: 'pr-m5-a', label: 'a · Instructional' }, { route: 'pr-m5-b', label: 'b · Experiential' }] },
+  { id: 'pr-m6', icon: 'hammer',         label: 'M6 · Cost Approach',    route: 'pr-m6', sub: [{ route: 'pr-m6-a', label: 'a · Instructional' }, { route: 'pr-m6-b', label: 'b · Experiential' }] },
+  { id: 'pr-m7', icon: 'trending-up',    label: 'M7 · Income Approach',  route: 'pr-m7', sub: [{ route: 'pr-m7-a', label: 'a · Instructional' }, { route: 'pr-m7-b', label: 'b · Experiential' }] },
+  { id: 'pr-m8', icon: 'git-merge',      label: 'M8 · Reconciliation',   route: 'pr-m8', sub: [{ route: 'pr-m8-a', label: 'a · Instructional' }, { route: 'pr-m8-b', label: 'b · Experiential' }] },
+  { id: 'pr-m9', icon: 'clipboard-check',label: 'M9 · Reporting',        route: 'pr-m9', sub: [{ route: 'pr-m9-a', label: 'a · Instructional' }, { route: 'pr-m9-b', label: 'b · Experiential' }] },
+
+  // ── Final ─────────────────────────────────────────────────────────
+  { id: 'div-final', divider: true },
+  { id: 'sec-final', sectionLabel: 'Final', sectionIcon: 'trophy' },
   {
-    id: 'step1', icon: 'file-search', label: 'Step 1 · Problem ID', route: 'phase-1-intro',
+    id: 'report-1', icon: 'file-text', label: 'Report 1 · Conv. Purchase', route: 'phase-1-intro',
+    matchRoutes: REPORT_1_ROUTES,
     sub: [
-      { route: 'ethics-lesson', label: 'a · Ethics' },
-      { route: 'tool-orientation', label: 'b · Tool orientation' },
-      { route: 'engagement-letter', label: 'c · Engagement letter' },
-      { route: 'preliminary-research', label: 'd · Prelim research' },
-      { route: 'inspection-scheduling', label: 'e · Inspect scheduling' },
-      { route: 'mentor-review-1', label: 'Review 1' },
+      { route: 'phase-1-intro',  label: 'Step 1 · Problem ID' },
+      { route: 'phase-2-launch', label: 'Step 2 · Inspection' },
+      { route: 'market-analysis',label: 'Step 3 · Market & HBU' },
+      { route: 'comp-selection', label: 'Step 4 · Comp Selection' },
+      { route: 'adjustment-grid',label: 'Step 5 · Valuation' },
+      { route: 'reconciliation', label: 'Step 6 · Reconciliation' },
+      { route: 'report-writing', label: 'Step 7 · Report' },
+      { route: 'capstone',       label: 'Step 8 · Communication' },
     ]
   },
-  {
-    id: 'step2', icon: 'home', label: 'Step 2 · Inspection', route: 'phase-2-launch',
-    sub: [
-      { route: 'property-research', label: 'a · Property research' },
-      { route: 'virtual-inspection', label: 'b · Virtual inspection' },
-      { route: 'gla-measurement', label: 'c · GLA measurement' },
-      { route: 'sketch', label: 'd · Sketch' },
-      { route: 'mentor-review-2', label: 'Review 2' },
-    ]
-  },
-  {
-    id: 'step3', icon: 'bar-chart-2', label: 'Step 3 · Market & HBU', route: 'market-analysis',
-    sub: [
-      { route: 'market-analysis', label: 'a · Market analysis' },
-      { route: 'hbu', label: 'b · HBU 4-test' },
-      { route: 'mentor-review-3', label: 'Review 3' },
-    ]
-  },
-  {
-    id: 'step4', icon: 'dollar-sign', label: 'Step 4 · Sales Analysis', route: 'comp-selection',
-    sub: [
-      { route: 'comp-selection', label: 'a · Comp selection' },
-      { route: 'mentor-review-4', label: 'Review 4' },
-    ]
-  },
-  {
-    id: 'step5', icon: 'calculator', label: 'Step 5 · Valuation', route: 'adjustment-grid',
-    sub: [
-      { route: 'adjustment-grid', label: 'a · Adjustment grid' },
-      { route: 'valuation', label: 'b · Value indication' },
-      { route: 'mentor-review-5', label: 'Review 5' },
-    ]
-  },
-  {
-    id: 'step6', icon: 'git-merge', label: 'Step 6 · Reconciliation', route: 'reconciliation',
-    sub: [
-      { route: 'reconciliation', label: 'a · Reconciliation' },
-      { route: 'mentor-review-6', label: 'Review 6' },
-    ]
-  },
-  {
-    id: 'step7', icon: 'file-text', label: 'Step 7 · Report', route: 'report-writing',
-    sub: [
-      { route: 'report-writing', label: 'a · Report writing' },
-      { route: 'uspap-checklist', label: 'b · USPAP checklist' },
-      { route: 'mentor-review-7', label: 'Review 7' },
-    ]
-  },
-  {
-    id: 'step8', icon: 'message-square', label: 'Step 8 · Communication', route: 'capstone',
-    sub: [
-      { route: 'capstone', label: 'a · Capstone' },
-      { route: 'mentor-review-8', label: 'Review 8' },
-    ]
-  },
-  { id: 'divider', divider: true },
-  { id: 'mentors-corner', icon: 'video', label: "Mentor's Corner", route: 'mentors-corner' },
-  { id: 'office-hours', icon: 'calendar-days', label: 'Office Hours', route: 'office-hours' },
-  { id: 'workfile', icon: 'folder-open', label: 'Workfile', route: 'workfile' },
-  { id: 'divider2', divider: true },
+  { id: 'report-2', icon: 'file-text', label: 'Report 2', route: 'report-2' },
+  { id: 'report-3', icon: 'file-text', label: 'Report 3', route: 'report-3' },
+
+  // ── Tools ─────────────────────────────────────────────────────────
+  { id: 'div-tools', divider: true },
   { id: 'tools-label', sectionLabel: 'Tools' },
-  { id: 'mls', icon: 'building-2', label: 'McKissock MLS', route: 'mls' },
-  { id: 'inspection', icon: 'scan-eye', label: 'McKissock Inspect', route: 'inspection' },
-  { id: 'urar-report', icon: 'clipboard-list', label: 'McKissock UAD', route: 'urar-report' },
+  { id: 'mls',        icon: 'building-2',    label: 'McKissock MLS',     route: 'mls' },
+  { id: 'inspection', icon: 'scan-eye',      label: 'McKissock Inspect', route: 'inspection' },
+  { id: 'urar-report',icon: 'clipboard-list',label: 'McKissock UAD',     route: 'urar-report' },
 ];
 
 function PAREASidebar({ active, onNav, collapsed }) {
   const [expanded, setExpanded] = useState(() => {
     for (const item of PAREA_NAV) {
-      if (item.sub && (item.route === active || item.sub.some(s => s.route === active))) {
-        return item.id;
-      }
+      if (!item.sub && !item.matchRoutes) continue;
+      if (item.route === active) return item.id;
+      if (item.sub?.some(s => s.route === active)) return item.id;
+      if (item.matchRoutes?.has(active)) return item.id;
     }
     return null;
   });
 
-  const sidebarBg = '#1e2333';
-  const sidebarText = '#b0b8cc';
+  const bg = '#fff';
+  const text = '#444';
+  const textMuted = '#888';
   const brand = '#d60436';
+  const activeBg = '#fff0f3';
 
   const isActive = (item) => {
     if (item.route === active) return true;
+    if (item.matchRoutes?.has(active)) return true;
     if (item.sub) return item.sub.some(s => s.route === active);
     return false;
   };
 
   return (
     <aside style={{
-      width: collapsed ? 60 : 232, background: sidebarBg,
+      width: collapsed ? 56 : 236, background: bg,
       display: 'flex', flexDirection: 'column', flexShrink: 0,
-      transition: 'width 250ms ease', overflow: 'hidden', minHeight: '100vh'
+      borderRight: '1px solid #e8e8e8',
+      transition: 'width 200ms ease', overflow: 'hidden', minHeight: '100vh',
     }}>
-      <nav style={{ flex: 1, padding: '10px 6px', display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'auto', overflowX: 'hidden' }}>
+      <nav style={{ flex: 1, padding: '8px 6px', display: 'flex', flexDirection: 'column', gap: 1, overflowY: 'auto', overflowX: 'hidden' }}>
         {PAREA_NAV.map((item) => {
           if (item.divider) {
-            return <div key={item.id} style={{ height: 1, background: 'rgba(255,255,255,0.08)', margin: '8px 6px' }} />;
+            return <div key={item.id} style={{ height: 1, background: '#e8e8e8', margin: '6px 4px' }} />;
           }
           if (item.sectionLabel) {
             if (collapsed) return null;
-            return <div key={item.id} style={{ padding: '6px 10px 2px', fontSize: 9, fontWeight: 700, color: 'rgba(176,184,204,0.45)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{item.sectionLabel}</div>;
+            return (
+              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '10px 10px 3px', marginTop: 2 }}>
+                {item.sectionIcon && <Icon name={item.sectionIcon} size={11} color={textMuted} />}
+                <div style={{ fontSize: 9.5, fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{item.sectionLabel}</div>
+              </div>
+            );
           }
           const active_ = isActive(item);
           const isExpanded = expanded === item.id && !collapsed;
@@ -148,50 +143,49 @@ function PAREASidebar({ active, onNav, collapsed }) {
                 onClick={() => {
                   if (item.sub && !collapsed) {
                     setExpanded(isExpanded ? null : item.id);
+                    if (!isExpanded) onNav(item.route);
                   } else {
                     onNav(item.route);
-                    if (item.sub && !collapsed) setExpanded(item.id);
                   }
                 }}
                 title={collapsed ? item.label : ''}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: collapsed ? '9px 0' : '8px 10px',
+                  display: 'flex', alignItems: 'center', gap: 9,
+                  padding: collapsed ? '9px 0' : '7px 10px',
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   borderRadius: 7, border: 'none', cursor: 'pointer',
                   fontFamily: 'inherit', fontSize: 12.5, fontWeight: active_ ? 700 : 400,
-                  background: active_ ? 'rgba(214,4,54,0.18)' : 'transparent',
-                  color: active_ ? '#fff' : sidebarText,
-                  transition: 'all 120ms ease', textAlign: 'left', width: '100%',
+                  background: active_ ? activeBg : 'transparent',
+                  color: active_ ? brand : text,
+                  transition: 'background 120ms, color 120ms', textAlign: 'left', width: '100%',
                   whiteSpace: 'nowrap',
-                  borderLeft: active_ ? `3px solid ${brand}` : '3px solid transparent'
+                  borderLeft: active_ ? `3px solid ${brand}` : '3px solid transparent',
                 }}
-                onMouseEnter={e => { if (!active_) e.currentTarget.style.background = 'rgba(255,255,255,0.07)'; }}
+                onMouseEnter={e => { if (!active_) e.currentTarget.style.background = '#f4f5f7'; }}
                 onMouseLeave={e => { if (!active_) e.currentTarget.style.background = 'transparent'; }}
               >
-                <Icon name={item.icon} size={16} color={active_ ? '#fff' : sidebarText} />
+                <Icon name={item.icon} size={15} color={active_ ? brand : textMuted} />
                 {!collapsed && <span style={{ flex: 1, fontSize: 12.5 }}>{item.label}</span>}
                 {!collapsed && item.sub && (
-                  <Icon name={isExpanded ? 'chevron-down' : 'chevron-right'} size={12} color={sidebarText} />
+                  <Icon name={isExpanded ? 'chevron-down' : 'chevron-right'} size={11} color={textMuted} />
                 )}
               </button>
               {!collapsed && isExpanded && item.sub && (
-                <div style={{ paddingLeft: 14 }}>
+                <div style={{ paddingLeft: 12, marginBottom: 2 }}>
                   {item.sub.map(sub => {
                     const subActive = active === sub.route;
                     return (
                       <button key={sub.route} onClick={() => onNav(sub.route)}
                         style={{
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          padding: '6px 10px', width: '100%',
-                          background: subActive ? 'rgba(214,4,54,0.15)' : 'transparent',
+                          display: 'flex', alignItems: 'center', gap: 8, padding: '5px 10px',
+                          width: '100%', background: subActive ? activeBg : 'transparent',
                           border: 'none', borderLeft: subActive ? `2px solid ${brand}` : '2px solid transparent',
                           borderRadius: '0 5px 5px 0', cursor: 'pointer',
                           fontFamily: 'inherit', fontSize: 11.5,
-                          color: subActive ? '#fff' : 'rgba(176,184,204,0.8)',
-                          textAlign: 'left', whiteSpace: 'nowrap'
+                          color: subActive ? brand : '#666',
+                          textAlign: 'left', whiteSpace: 'nowrap', fontWeight: subActive ? 600 : 400,
                         }}
-                        onMouseEnter={e => { if (!subActive) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                        onMouseEnter={e => { if (!subActive) e.currentTarget.style.background = '#f4f5f7'; }}
                         onMouseLeave={e => { if (!subActive) e.currentTarget.style.background = 'transparent'; }}
                       >
                         {sub.label}
@@ -204,7 +198,7 @@ function PAREASidebar({ active, onNav, collapsed }) {
           );
         })}
       </nav>
-      <div style={{ padding: '10px 6px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ padding: '10px 6px', borderTop: '1px solid #e8e8e8' }}>
         <div style={{
           display: 'flex', alignItems: 'center', gap: 9,
           padding: collapsed ? '9px 0' : '9px 10px',
@@ -214,8 +208,8 @@ function PAREASidebar({ active, onNav, collapsed }) {
           <Avatar name="Sarah H" size={28} />
           {!collapsed && (
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>Sarah H.</div>
-              <div style={{ fontSize: 10, color: sidebarText }}>Appraiser Trainee</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: '#292929' }}>Sarah H.</div>
+              <div style={{ fontSize: 10, color: textMuted }}>Cohort 04 · Day 87</div>
             </div>
           )}
         </div>
@@ -770,6 +764,132 @@ function S_SelectRegion({ navigate }) {
   );
 }
 
+// ── Practice Modules ─────────────────────────────────────────────
+const PRACTICE_PROPERTIES = 'Evanston Single-Family · Pilsen Two-Flat · Streeterville Condo · Gold Coast Co-op';
+
+const PRACTICE_MODULES = [
+  { id: 1, route: 'pr-m1', icon: 'target',
+    title: 'Identification of the Problem',
+    instructional: 'Introduces the 6 assignment elements (client, intended use/users, type & def of value, effective date, property rights, conditions). Branching scenario extracts each element from a realistic engagement letter; a decision tree walks through how atypical ownership (like the co-op) changes problem identification; knowledge check tests element recognition across all 4 properties.',
+    experiential: 'Contact a Loan Officer or AMC coordinator — request a sample engagement letter or walk through one together. Extract and document all assignment elements.',
+    tools: [] },
+  { id: 2, route: 'pr-m2', icon: 'layers',
+    title: 'Determination of Scope of Work',
+    instructional: 'Covers the SCOPE framework (what to research, inspect, and analyze). Scenarios present each property with varying complexity triggers — co-op ownership, vintage Pilsen two-flat. A decision tree guides trainees through expanding or limiting scope based on those triggers; knowledge check asks them to justify scope decisions for each property type.',
+    experiential: 'Interview a Real Estate Agent about a specific listed or sold property. Identify what factors would expand or limit scope.',
+    tools: [] },
+  { id: 3, route: 'pr-m3', icon: 'database',
+    title: 'Collection and Analysis of Data',
+    instructional: 'McKissock MLS — search comparable listings and sales, filter by property type, analyze market trends for each of the 4 properties. McKissock Inspect — conduct a virtual walkthrough via Matterport, record condition/quality ratings, and produce a floor plan sketch.',
+    experiential: 'Physically visit a property and complete a structured field worksheet (condition, quality, measurements). Pull the same property\'s public record from the County Assessor and compare findings.',
+    tools: ['mls', 'inspection'] },
+  { id: 4, route: 'pr-m4', icon: 'building-2',
+    title: 'Determination of Highest and Best Use',
+    instructional: 'Covers the 4 HBU tests (legally permissible, physically possible, financially feasible, maximally productive). Applies each test to all 4 properties, highlighting how zoning and ownership type constrain HBU differently. Decision tree handles properties where current use may not be HBU (e.g., underimproved Pilsen lot); knowledge check asks trainees to state and support the HBU conclusion for each property.',
+    experiential: 'Look up a real property\'s zoning via the local municipality website. If accessible, call the Permits or Zoning Department to ask one question about permitted use.',
+    tools: [] },
+  { id: 5, route: 'pr-m5', icon: 'bar-chart-2',
+    title: 'Application of the Approaches to Value: Sales Comparison',
+    instructional: 'McKissock UAD (3.6) — select and enter comparable sales pulled from McKissock MLS, make and support adjustments for each property type. The form dynamically adjusts fields based on property characteristics (e.g., co-op vs. condo grid differences).',
+    experiential: 'Interview a Real Estate Agent — discuss recent comp sales and what buyers pay more/less for. Map responses directly to adjustment line items.',
+    tools: ['urar-report'] },
+  { id: 6, route: 'pr-m6', icon: 'hammer',
+    title: 'Application of the Approaches to Value: Cost Approach',
+    instructional: 'McKissock UAD (3.6) — estimate replacement cost new, apply depreciation methods, and complete the cost approach section. The form adjusts based on property type — cost approach is less applicable to the co-op, so trainees encounter a real-world applicability decision.',
+    experiential: 'Contact a local contractor or builder — ask about current cost per square foot and common depreciation factors. Use responses to ground-truth cost inputs.',
+    tools: ['urar-report'] },
+  { id: 7, route: 'pr-m7', icon: 'trending-up',
+    title: 'Application of the Approaches to Value: Income Approach',
+    instructional: 'McKissock UAD (3.6) — GRM analysis using market rent data, vacancy and expense factors, income-based value indicator. Income fields activate primarily for the Pilsen Two-Flat and co-op, reinforcing when this approach is relevant.',
+    experiential: 'Interview a landlord, property manager, or tenant — ask about current rents, vacancy, and expenses. Use real responses to validate GRM and income inputs.',
+    tools: ['urar-report'] },
+  { id: 8, route: 'pr-m8', icon: 'git-merge',
+    title: 'Reconciliation',
+    instructional: 'McKissock UAD (3.6) — review all three approach indicators within the form, weigh their reliability for each property type, and write a supported reconciliation narrative. The form requires a final value opinion with written justification before it can be submitted.',
+    experiential: 'Conversation with a PAREA mentor or local appraiser — discuss how they weigh approaches and handle conflicting indicators. Document key takeaways and compare to your own reconciliation decisions.',
+    tools: ['urar-report'] },
+  { id: 9, route: 'pr-m9', icon: 'clipboard-check',
+    title: 'Reporting of the Appraisal',
+    instructional: 'McKissock UAD (3.6) — finalize the complete UAD 3.6 report for each property, review built-in USPAP compliance checkpoints, and submit for mentor review. The form surfaces any incomplete or inconsistent fields before final submission.',
+    experiential: 'Contact an AMC coordinator or lender reviewer — ask what causes report kickbacks and what a "clean" report looks like. Reflect on how those standards show up in your completed McKissock UAD output.',
+    tools: ['urar-report'] },
+];
+
+const TOOL_LABELS = { mls: 'McKissock MLS', inspection: 'McKissock Inspect', 'urar-report': 'McKissock UAD' };
+
+function PracticeModuleScreen({ module, navigate }) {
+  return (
+    <div style={{ maxWidth: 840, margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+        <Badge>Module {module.id} of 9</Badge>
+        <Badge color="warning">In development</Badge>
+      </div>
+      <h1 style={{ fontFamily: "'Nunito', sans-serif", fontSize: 24, fontWeight: 800, color: '#292929', margin: '8px 0 4px' }}>{module.title}</h1>
+      <p style={{ fontSize: 12.5, color: '#888', marginBottom: 22, lineHeight: 1.5 }}>4 properties: {PRACTICE_PROPERTIES}</p>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <Card padding={20}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #d60436, #ff5577)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Icon name="monitor" size={17} color="#fff" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 6 }}>Instructional</div>
+              <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.65, margin: 0 }}>{module.instructional}</p>
+              {module.tools.length > 0 && (
+                <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                  {module.tools.map(t => (
+                    <button key={t} onClick={() => navigate(t)}
+                      style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 13px', borderRadius: 7, border: '1.5px solid #d60436', background: '#fff0f3', color: '#d60436', fontFamily: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                      <Icon name="external-link" size={12} color="#d60436" />
+                      {TOOL_LABELS[t]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        <Card padding={20}>
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+            <div style={{ width: 36, height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #1a9e5c, #2fd88a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Icon name="map-pin" size={17} color="#fff" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 6 }}>Experiential</div>
+              <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.65, margin: 0 }}>{module.experiential}</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <div style={{ marginTop: 14, background: '#fff8ec', border: '1px solid #f5cfa0', borderRadius: 10, padding: '11px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Icon name="hammer" size={14} color="#e8860a" />
+        <div style={{ fontSize: 12.5, color: '#7a4a00' }}>Interactive lessons for this module are still being built. Check back soon.</div>
+      </div>
+    </div>
+  );
+}
+
+function S_ReportPlaceholder({ number, navigate }) {
+  return (
+    <div style={{ maxWidth: 700, margin: '0 auto' }}>
+      <PageHeader title={`Report ${number}`} subtitle={`The case assignment for Report ${number} will become available after you complete Report 1.`} />
+      <Card padding={28}>
+        <div style={{ textAlign: 'center', padding: '20px 0' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff8ec', border: '1px solid #f5cfa0', color: '#7a4a00', padding: '6px 14px', borderRadius: 999, fontSize: 11, fontWeight: 700, marginBottom: 16 }}>
+            <Icon name="hammer" size={13} color="#e8860a" /> In development
+          </div>
+          <h2 style={{ fontFamily: "'Nunito', sans-serif", fontSize: 22, fontWeight: 800, color: '#292929', margin: '0 0 10px' }}>Report {number} — Coming soon</h2>
+          <p style={{ fontSize: 13.5, color: '#666', lineHeight: 1.6, margin: '0 0 20px' }}>Complete the 9 Practice modules and Report 1 to unlock this assignment.</p>
+          <Button variant="ghost" onClick={() => navigate('home')}>Back to Dashboard</Button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 // ── Route → Screen ────────────────────────────────────────────────
 function renderScreen(route, navigate, tweaks) {
   const p = { navigate, tweaks };
@@ -813,6 +933,18 @@ function renderScreen(route, navigate, tweaks) {
     case 'mls': return <MLSTool />;
     case 'inspection': return <InspectionTool />;
     case 'urar-report': return <ReportTool />;
+    case 'report-2': return <S_ReportPlaceholder number={2} {...p} />;
+    case 'report-3': return <S_ReportPlaceholder number={3} {...p} />;
+    // Practice modules
+    case 'pr-m1': case 'pr-m1-a': case 'pr-m1-b': return <PracticeModuleScreen module={PRACTICE_MODULES[0]} {...p} />;
+    case 'pr-m2': case 'pr-m2-a': case 'pr-m2-b': return <PracticeModuleScreen module={PRACTICE_MODULES[1]} {...p} />;
+    case 'pr-m3': case 'pr-m3-a': case 'pr-m3-b': return <PracticeModuleScreen module={PRACTICE_MODULES[2]} {...p} />;
+    case 'pr-m4': case 'pr-m4-a': case 'pr-m4-b': return <PracticeModuleScreen module={PRACTICE_MODULES[3]} {...p} />;
+    case 'pr-m5': case 'pr-m5-a': case 'pr-m5-b': return <PracticeModuleScreen module={PRACTICE_MODULES[4]} {...p} />;
+    case 'pr-m6': case 'pr-m6-a': case 'pr-m6-b': return <PracticeModuleScreen module={PRACTICE_MODULES[5]} {...p} />;
+    case 'pr-m7': case 'pr-m7-a': case 'pr-m7-b': return <PracticeModuleScreen module={PRACTICE_MODULES[6]} {...p} />;
+    case 'pr-m8': case 'pr-m8-a': case 'pr-m8-b': return <PracticeModuleScreen module={PRACTICE_MODULES[7]} {...p} />;
+    case 'pr-m9': case 'pr-m9-a': case 'pr-m9-b': return <PracticeModuleScreen module={PRACTICE_MODULES[8]} {...p} />;
     default: return <S03_Dashboard {...p} />;
   }
 }
