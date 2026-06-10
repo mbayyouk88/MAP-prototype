@@ -6,7 +6,9 @@ import InspectionTool from './tools/InspectionTool';
 import ReportTool from './tools/ReportTool';
 
 const FULL_HEIGHT_ROUTES = ['inspection', 'urar-report', 'report-writing',
-  'pr-m3','pr-m3-a','pr-m3-b','pr-m9','pr-m9-a','pr-m9-b'];
+  'pr-m3', 'pr-m3-a', 'pr-m3-b',
+  'pr-m5', 'pr-m5-a', 'pr-m6', 'pr-m6-a', 'pr-m7', 'pr-m7-a', 'pr-m8', 'pr-m8-a',
+  'pr-m9', 'pr-m9-a'];
 import {
   C, Icon, Button, Badge, Avatar, Card, CardSection, StepTracker, CheckItem,
   Textarea, Input, Toast, PageHeader, ToolCard,
@@ -55,13 +57,13 @@ const PAREA_NAV = [
   { id: 'sec-practice', sectionLabel: 'Practice', sectionIcon: 'dumbbell' },
   { id: 'pr-m1', icon: 'target',         label: 'M1 · Problem ID',       route: 'pr-m1', sub: [{ route: 'pr-m1-a', label: 'a · Instructional' }, { route: 'pr-m1-b', label: 'b · Experiential' }] },
   { id: 'pr-m2', icon: 'layers',         label: 'M2 · Scope of Work',    route: 'pr-m2', sub: [{ route: 'pr-m2-a', label: 'a · Instructional' }, { route: 'pr-m2-b', label: 'b · Experiential' }] },
-  { id: 'pr-m3', icon: 'database',       label: 'M3 · Data Collection',  route: 'pr-m3', sub: [{ route: 'pr-m3-a', label: 'a · Instructional' }, { route: 'pr-m3-b', label: 'b · Experiential' }] },
+  { id: 'pr-m3', icon: 'database',       label: 'M3 · Data Collection',  route: 'pr-m3-a', sub: [{ route: 'pr-m3-a', label: 'a · Instructional · MLS' }, { route: 'pr-m3-b', label: 'b · McKissock Inspect' }, { route: 'pr-m3-c', label: 'c · Experiential' }] },
   { id: 'pr-m4', icon: 'building-2',     label: 'M4 · HBU',              route: 'pr-m4', sub: [{ route: 'pr-m4-a', label: 'a · Instructional' }, { route: 'pr-m4-b', label: 'b · Experiential' }] },
   { id: 'pr-m5', icon: 'bar-chart-2',    label: 'M5 · Sales Comparison', route: 'pr-m5', sub: [{ route: 'pr-m5-a', label: 'a · Instructional' }, { route: 'pr-m5-b', label: 'b · Experiential' }] },
   { id: 'pr-m6', icon: 'hammer',         label: 'M6 · Cost Approach',    route: 'pr-m6', sub: [{ route: 'pr-m6-a', label: 'a · Instructional' }, { route: 'pr-m6-b', label: 'b · Experiential' }] },
   { id: 'pr-m7', icon: 'trending-up',    label: 'M7 · Income Approach',  route: 'pr-m7', sub: [{ route: 'pr-m7-a', label: 'a · Instructional' }, { route: 'pr-m7-b', label: 'b · Experiential' }] },
   { id: 'pr-m8', icon: 'git-merge',      label: 'M8 · Reconciliation',   route: 'pr-m8', sub: [{ route: 'pr-m8-a', label: 'a · Instructional' }, { route: 'pr-m8-b', label: 'b · Experiential' }] },
-  { id: 'pr-m9', icon: 'clipboard-check',label: 'M9 · Reporting',        route: 'pr-m9', sub: [{ route: 'pr-m9-a', label: 'a · Instructional' }, { route: 'pr-m9-b', label: 'b · Experiential' }] },
+  { id: 'pr-m9', icon: 'clipboard-check',label: 'M9 · Reporting',        route: 'pr-m9-a', sub: [{ route: 'pr-m9-a', label: 'a · McKissock UAD' }, { route: 'pr-m9-b', label: 'b · Experiential' }] },
 
   // ── Final ─────────────────────────────────────────────────────────
   { id: 'div-final', divider: true },
@@ -793,49 +795,60 @@ const PRACTICE_PROPERTIES = 'Evanston Single-Family · Pilsen Two-Flat · Street
 const PRACTICE_MODULES = [
   { id: 1, route: 'pr-m1', icon: 'target',
     title: 'Identification of the Problem',
-    instructional: 'Introduces the 6 assignment elements (client, intended use/users, type & def of value, effective date, property rights, conditions). Branching scenario extracts each element from a realistic engagement letter; a decision tree walks through how atypical ownership (like the co-op) changes problem identification; knowledge check tests element recognition across all 4 properties.',
-    experiential: 'Contact a Loan Officer or AMC coordinator — request a sample engagement letter or walk through one together. Extract and document all assignment elements.',
+    instructional: 'Introduces the 6 assignment elements (client, intended use/users, type & def of value, effective date, property rights, conditions). A branching scenario presents a realistic engagement letter where trainees extract each element; a decision tree walks through how atypical ownership (like the co-op) changes problem identification; a knowledge check tests element recognition across all 4 properties.',
+    experiential: 'Contact a Loan Officer or AMC coordinator — request a sample engagement letter or walk through one together. Extract and document all 6 assignment elements.',
     tools: [] },
   { id: 2, route: 'pr-m2', icon: 'layers',
     title: 'Determination of Scope of Work',
-    instructional: 'Covers the SCOPE framework (what to research, inspect, and analyze). Scenarios present each property with varying complexity triggers — co-op ownership, vintage Pilsen two-flat. A decision tree guides trainees through expanding or limiting scope based on those triggers; knowledge check asks them to justify scope decisions for each property type.',
-    experiential: 'Interview a Real Estate Agent about a specific listed or sold property. Identify what factors would expand or limit scope.',
+    instructional: 'Covers the SCOPE framework (what to research, inspect, and analyze). A scenario presents each of the 4 properties with varying complexity triggers (co-op ownership, vintage Pilsen two-flat); a decision tree guides trainees through expanding or limiting scope based on those triggers; a knowledge check asks them to justify scope decisions for each property type.',
+    experiential: 'Interview a Real Estate Agent — ask about a specific listed or sold property. Identify what factors would expand or limit scope.',
     tools: [] },
   { id: 3, route: 'pr-m3', icon: 'database',
     title: 'Collection and Analysis of Data',
-    instructional: 'McKissock MLS — search comparable listings and sales, filter by property type, analyze market trends for each of the 4 properties. McKissock Inspect — conduct a virtual walkthrough via Matterport, record condition/quality ratings, and produce a floor plan sketch.',
-    experiential: 'Physically visit a property and complete a structured field worksheet (condition, quality, measurements). Pull the same property\'s public record from the County Assessor and compare findings.',
-    tools: ['mls', 'inspection'], inline: true },
+    instructional: 'McKissock MLS — trainees search for comparable listings and sales, filter by property type, and analyze market trends for each of the 4 properties. McKissock Inspect — trainees conduct a virtual walkthrough via Matterport for each property, record condition/quality ratings, and produce a floor plan sketch.',
+    experiential: 'Physically visit a property and complete a structured field worksheet (condition, quality, measurements). Pull the same property\'s public record from the County Assessor website and compare findings.',
+    tools: ['mls', 'inspection'], inline: true,
+    toolActivities: {
+      mls: 'Search for comparable listings and sales for each of the 4 properties. Filter by property type, price range, and proximity. Save 3+ comp candidates per property and note days on market, list-to-sale ratios, and neighborhood trends.',
+      inspection: 'Conduct a virtual walkthrough via the Matterport viewer. Record condition ratings (C1–C6) and quality ratings (Q1–Q6) for each property. Produce a floor plan sketch and calculate GLA using the ANSI Z765 standard.',
+    } },
   { id: 4, route: 'pr-m4', icon: 'building-2',
     title: 'Determination of Highest and Best Use',
-    instructional: 'Covers the 4 HBU tests (legally permissible, physically possible, financially feasible, maximally productive). Applies each test to all 4 properties, highlighting how zoning and ownership type constrain HBU differently. Decision tree handles properties where current use may not be HBU (e.g., underimproved Pilsen lot); knowledge check asks trainees to state and support the HBU conclusion for each property.',
+    instructional: 'Covers the 4 HBU tests (legally permissible, physically possible, financially feasible, maximally productive). A scenario applies each test to all 4 properties, highlighting how zoning and ownership type constrain HBU differently; a decision tree handles properties where current use may not be HBU (e.g., underimproved Pilsen lot); a knowledge check asks trainees to state and support the HBU conclusion for each property.',
     experiential: 'Look up a real property\'s zoning via the local municipality website. If accessible, call the Permits or Zoning Department to ask one question about permitted use.',
     tools: [] },
   { id: 5, route: 'pr-m5', icon: 'bar-chart-2',
     title: 'Application of the Approaches to Value: Sales Comparison',
-    instructional: 'McKissock UAD (3.6) — select and enter comparable sales pulled from McKissock MLS, make and support adjustments for each property type. The form dynamically adjusts fields based on property characteristics (e.g., co-op vs. condo grid differences).',
-    experiential: 'Interview a Real Estate Agent — discuss recent comp sales and what buyers pay more/less for. Map responses directly to adjustment line items.',
-    tools: ['urar-report'] },
+    instructional: 'McKissock Report (UAD 3.6) — trainees select and enter comparable sales pulled from McKissock MLS, make and support adjustments for each property type, and see how the form dynamically adjusts fields based on property characteristics (e.g., co-op vs. condo grid differences).',
+    experiential: 'Interview a Real Estate Agent — discuss recent comp sales and what buyers pay more or less for. Map responses directly to adjustment line items.',
+    tools: ['urar-report'], inline: true,
+    toolActivities: { 'urar-report': 'Select and enter comparable sales from McKissock MLS. Make and support adjustments for each of the 4 property types. Note how the form adjusts fields for co-op vs. condo grid differences.' } },
   { id: 6, route: 'pr-m6', icon: 'hammer',
     title: 'Application of the Approaches to Value: Cost Approach',
-    instructional: 'McKissock UAD (3.6) — estimate replacement cost new, apply depreciation methods, and complete the cost approach section. The form adjusts based on property type — cost approach is less applicable to the co-op, so trainees encounter a real-world applicability decision.',
-    experiential: 'Contact a local contractor or builder — ask about current cost per square foot and common depreciation factors. Use responses to ground-truth cost inputs.',
-    tools: ['urar-report'] },
+    instructional: 'McKissock Report (UAD 3.6) — trainees estimate replacement cost new, apply depreciation methods, and complete the cost approach section. The form adjusts based on property type (cost approach is less applicable to the co-op, so trainees encounter a real-world applicability decision).',
+    experiential: 'Contact a local contractor or builder — ask about current cost per square foot and common depreciation factors in their area. Use responses to ground-truth cost inputs.',
+    tools: ['urar-report'], inline: true,
+    toolActivities: { 'urar-report': 'Estimate replacement cost new, apply depreciation methods, and complete the cost approach section. Note where the form signals that cost approach is less applicable — and write the rationale.' } },
   { id: 7, route: 'pr-m7', icon: 'trending-up',
     title: 'Application of the Approaches to Value: Income Approach',
-    instructional: 'McKissock UAD (3.6) — GRM analysis using market rent data, vacancy and expense factors, income-based value indicator. Income fields activate primarily for the Pilsen Two-Flat and co-op, reinforcing when this approach is relevant.',
+    instructional: 'McKissock Report (UAD 3.6) — trainees complete GRM analysis using market rent data, apply vacancy and expense factors, and reconcile an income-based value indicator. The form activates income fields primarily for the Pilsen Two-Flat and co-op, reinforcing when this approach is relevant.',
     experiential: 'Interview a landlord, property manager, or tenant — ask about current rents, vacancy, and expenses. Use real responses to validate GRM and income inputs.',
-    tools: ['urar-report'] },
+    tools: ['urar-report'], inline: true,
+    toolActivities: { 'urar-report': 'Complete GRM analysis using market rent data, apply vacancy and expense factors, and reconcile an income-based value indicator. Note when income fields activate (Pilsen Two-Flat and co-op) vs. when they don\'t.' } },
   { id: 8, route: 'pr-m8', icon: 'git-merge',
     title: 'Reconciliation',
-    instructional: 'McKissock UAD (3.6) — review all three approach indicators within the form, weigh their reliability for each property type, and write a supported reconciliation narrative. The form requires a final value opinion with written justification before it can be submitted.',
+    instructional: 'McKissock Report (UAD 3.6) — trainees review all three approach indicators within the form, weigh their reliability for each property type, and write a supported reconciliation narrative. The form requires a final value opinion with written justification before it can be submitted.',
     experiential: 'Conversation with a PAREA mentor or local appraiser — discuss how they weigh approaches and handle conflicting indicators. Document key takeaways and compare to your own reconciliation decisions.',
-    tools: ['urar-report'] },
+    tools: ['urar-report'], inline: true,
+    toolActivities: { 'urar-report': 'Review all three approach indicators, weigh their reliability for each property type, and write a supported reconciliation narrative. The form requires a final value opinion with written justification before submission.' } },
   { id: 9, route: 'pr-m9', icon: 'clipboard-check',
     title: 'Reporting of the Appraisal',
-    instructional: 'McKissock UAD (3.6) — finalize the complete UAD 3.6 report for each property, review built-in USPAP compliance checkpoints, and submit for mentor review. The form surfaces any incomplete or inconsistent fields before final submission.',
-    experiential: 'Contact an AMC coordinator or lender reviewer — ask what causes report kickbacks and what a "clean" report looks like. Reflect on how those standards show up in your completed McKissock UAD output.',
-    tools: ['urar-report'], inline: true },
+    instructional: 'McKissock Report (UAD 3.6) — trainees finalize the complete UAD 3.6 report for each property, review USPAP compliance checkpoints built into the form, and submit for mentor review. The dynamic form surfaces any incomplete or inconsistent fields before final submission.',
+    experiential: 'Contact an AMC coordinator or lender reviewer — ask what causes report kickbacks and what a "clean" report looks like from their side. Reflect on how those standards show up in your completed McKissock Report output.',
+    tools: ['urar-report'], inline: true,
+    toolActivities: {
+      'urar-report': 'Finalize the complete UAD 3.6 report for each of the 4 properties. Review all USPAP compliance checkpoints. Correct any flagged fields before submitting for mentor review.',
+    } },
 ];
 
 const TOOL_LABELS = { mls: 'McKissock MLS', inspection: 'McKissock Inspect', 'urar-report': 'McKissock UAD' };
@@ -938,6 +951,38 @@ function PracticeModuleScreen({ module, route, navigate }) {
   );
 }
 
+function PracticeExperientialCard({ module, navigate }) {
+  const modIdx = PRACTICE_MODULES.findIndex(m => m.id === module.id);
+  const prev = modIdx > 0 ? PRACTICE_MODULES[modIdx - 1] : null;
+  const next = modIdx < PRACTICE_MODULES.length - 1 ? PRACTICE_MODULES[modIdx + 1] : null;
+  return (
+    <div style={{ maxWidth: 700, margin: '0 auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Badge>Module {module.id} of 9</Badge>
+          <span style={{ fontSize: 13, color: '#888' }}>Experiential</span>
+        </div>
+        <div style={{ display: 'flex', gap: 5 }}>
+          {prev && <button onClick={() => navigate(prev.route + '-c')} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', color: '#555', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer' }}><Icon name="chevron-left" size={12} color="#555" />M{prev.id}</button>}
+          {next && <button onClick={() => navigate(next.route + (next.tools?.length ? '-c' : '-b'))} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', color: '#555', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer' }}>M{next.id}<Icon name="chevron-right" size={12} color="#555" /></button>}
+        </div>
+      </div>
+      <h1 style={{ fontFamily: "'Nunito', sans-serif", fontSize: 22, fontWeight: 800, color: '#292929', margin: '8px 0 18px' }}>{module.title}</h1>
+      <Card padding={24}>
+        <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+          <div style={{ width: 38, height: 38, borderRadius: 9, background: 'linear-gradient(135deg, #1a9e5c, #2fd88a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon name="map-pin" size={18} color="#fff" />
+          </div>
+          <div>
+            <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>Your assignment</div>
+            <p style={{ fontSize: 14, color: '#444', lineHeight: 1.7, margin: 0 }}>{module.experiential}</p>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
 function S_ReportPlaceholder({ number, navigate }) {
   return (
     <div style={{ maxWidth: 700, margin: '0 auto' }}>
@@ -1004,13 +1049,23 @@ function renderScreen(route, navigate, tweaks) {
     // Practice modules
     case 'pr-m1': case 'pr-m1-a': case 'pr-m1-b': return <PracticeModuleScreen module={PRACTICE_MODULES[0]} {...p} />;
     case 'pr-m2': case 'pr-m2-a': case 'pr-m2-b': return <PracticeModuleScreen module={PRACTICE_MODULES[1]} {...p} />;
-    case 'pr-m3': case 'pr-m3-a': case 'pr-m3-b': return <PracticeModuleFullLayout module={PRACTICE_MODULES[2]} route={route} navigate={navigate} />;
+    // M3: a→MLS tool, b→Inspect tool, c→experiential card
+    case 'pr-m3': case 'pr-m3-a': return <PracticeModuleFullLayout module={PRACTICE_MODULES[2]} route="pr-m3-a" navigate={navigate} />;
+    case 'pr-m3-b': return <PracticeModuleFullLayout module={PRACTICE_MODULES[2]} route="pr-m3-b" navigate={navigate} />;
+    case 'pr-m3-c': return <PracticeExperientialCard module={PRACTICE_MODULES[2]} navigate={navigate} />;
     case 'pr-m4': case 'pr-m4-a': case 'pr-m4-b': return <PracticeModuleScreen module={PRACTICE_MODULES[3]} {...p} />;
-    case 'pr-m5': case 'pr-m5-a': case 'pr-m5-b': return <PracticeModuleScreen module={PRACTICE_MODULES[4]} {...p} />;
-    case 'pr-m6': case 'pr-m6-a': case 'pr-m6-b': return <PracticeModuleScreen module={PRACTICE_MODULES[5]} {...p} />;
-    case 'pr-m7': case 'pr-m7-a': case 'pr-m7-b': return <PracticeModuleScreen module={PRACTICE_MODULES[6]} {...p} />;
-    case 'pr-m8': case 'pr-m8-a': case 'pr-m8-b': return <PracticeModuleScreen module={PRACTICE_MODULES[7]} {...p} />;
-    case 'pr-m9': case 'pr-m9-a': case 'pr-m9-b': return <PracticeModuleFullLayout module={PRACTICE_MODULES[8]} route={route} navigate={navigate} />;
+    // M5-M8: a→UAD tool (full height), b→experiential card
+    case 'pr-m5': case 'pr-m5-a': return <PracticeModuleFullLayout module={PRACTICE_MODULES[4]} route="pr-m5-a" navigate={navigate} />;
+    case 'pr-m5-b': return <PracticeExperientialCard module={PRACTICE_MODULES[4]} navigate={navigate} />;
+    case 'pr-m6': case 'pr-m6-a': return <PracticeModuleFullLayout module={PRACTICE_MODULES[5]} route="pr-m6-a" navigate={navigate} />;
+    case 'pr-m6-b': return <PracticeExperientialCard module={PRACTICE_MODULES[5]} navigate={navigate} />;
+    case 'pr-m7': case 'pr-m7-a': return <PracticeModuleFullLayout module={PRACTICE_MODULES[6]} route="pr-m7-a" navigate={navigate} />;
+    case 'pr-m7-b': return <PracticeExperientialCard module={PRACTICE_MODULES[6]} navigate={navigate} />;
+    case 'pr-m8': case 'pr-m8-a': return <PracticeModuleFullLayout module={PRACTICE_MODULES[7]} route="pr-m8-a" navigate={navigate} />;
+    case 'pr-m8-b': return <PracticeExperientialCard module={PRACTICE_MODULES[7]} navigate={navigate} />;
+    // M9: a→UAD tool, b→experiential card
+    case 'pr-m9': case 'pr-m9-a': return <PracticeModuleFullLayout module={PRACTICE_MODULES[8]} route="pr-m9-a" navigate={navigate} />;
+    case 'pr-m9-b': return <PracticeExperientialCard module={PRACTICE_MODULES[8]} navigate={navigate} />;
     default: return <S03_Dashboard {...p} />;
   }
 }
@@ -1087,13 +1142,11 @@ const PM_TOOL_META = {
 
 function PracticeModuleFullLayout({ module, route, navigate }) {
   const isExp = route?.endsWith('-b');
-  const [tool, setTool] = useState(module.tools[0]);
-
   const modIdx = PRACTICE_MODULES.findIndex(m => m.id === module.id);
   const prev = modIdx > 0 ? PRACTICE_MODULES[modIdx - 1] : null;
   const next = modIdx < PRACTICE_MODULES.length - 1 ? PRACTICE_MODULES[modIdx + 1] : null;
 
-  const tabBtn = (active, label, icon, onClick) => (
+  const instExpTab = (active, label, icon, onClick) => (
     <button onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 7, padding: '7px 14px',
       borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
@@ -1105,6 +1158,27 @@ function PracticeModuleFullLayout({ module, route, navigate }) {
       {label}
     </button>
   );
+
+  const toolPanel = (toolKey) => {
+    const meta = PM_TOOL_META[toolKey];
+    const activity = module.toolActivities?.[toolKey];
+    return (
+      <div key={toolKey} style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: toolKey !== module.tools[module.tools.length - 1] ? '1px solid #e8e8e8' : 'none' }}>
+        <div style={{ padding: '9px 16px', background: '#fafafa', borderBottom: '1px solid #e8e8e8', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: activity ? 4 : 0 }}>
+            <Icon name={meta.icon} size={13} color="#555" />
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: '#292929' }}>{meta.label}</span>
+          </div>
+          {activity && <p style={{ fontSize: 11.5, color: '#666', margin: 0, lineHeight: 1.55 }}>{activity}</p>}
+        </div>
+        <div style={{ flex: 1, overflow: meta.overflow }}>
+          {toolKey === 'mls'         && <MLSTool />}
+          {toolKey === 'inspection'  && <InspectionTool />}
+          {toolKey === 'urar-report' && <ReportTool />}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
@@ -1121,13 +1195,12 @@ function PracticeModuleFullLayout({ module, route, navigate }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 3, background: '#f0f1f3', borderRadius: 8, padding: 3, width: 'fit-content' }}>
-          {tabBtn(!isExp, 'Instructional', 'monitor', () => navigate(module.route + '-a'))}
-          {tabBtn(isExp,  'Experiential',  'map-pin',  () => navigate(module.route + '-b'))}
+          {instExpTab(!isExp, 'Instructional', 'monitor', () => navigate(module.route + '-a'))}
+          {instExpTab(isExp,  'Experiential',  'map-pin',  () => navigate(module.route + '-b'))}
         </div>
       </div>
 
       {isExp ? (
-        /* Experiential tab — scrollable card */
         <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px 60px' }}>
           <Card padding={22}>
             <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
@@ -1142,34 +1215,9 @@ function PracticeModuleFullLayout({ module, route, navigate }) {
           </Card>
         </div>
       ) : (
-        /* Instructional tab — tool switcher fills the rest of the screen */
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          {module.tools.length > 1 && (
-            <div style={{ display: 'flex', padding: '0 20px', borderBottom: '1px solid #e8e8e8', background: '#fafafa', flexShrink: 0 }}>
-              {module.tools.map(t => {
-                const m = PM_TOOL_META[t];
-                const active = tool === t;
-                return (
-                  <button key={t} onClick={() => setTool(t)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: 7, padding: '9px 16px',
-                      border: 'none', borderBottom: active ? '2px solid #d60436' : '2px solid transparent',
-                      background: 'none', cursor: 'pointer', fontFamily: 'inherit',
-                      fontSize: 12.5, fontWeight: active ? 700 : 400,
-                      color: active ? '#d60436' : '#666', marginBottom: -1,
-                    }}>
-                    <Icon name={m.icon} size={13} color={active ? '#d60436' : '#999'} />
-                    {m.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          <div style={{ flex: 1, overflow: PM_TOOL_META[tool]?.overflow || 'auto' }}>
-            {tool === 'mls'          && <MLSTool />}
-            {tool === 'inspection'   && <InspectionTool />}
-            {tool === 'urar-report'  && <ReportTool />}
-          </div>
+        /* All tools visible side by side — no tab switching needed */
+        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+          {module.tools.map(t => toolPanel(t))}
         </div>
       )}
     </div>
