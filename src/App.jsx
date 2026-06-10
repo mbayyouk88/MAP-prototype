@@ -27,6 +27,7 @@ const PAREA_NAV = [
   { id: 'home', icon: 'layout-dashboard', label: 'Dashboard', route: 'home' },
   { id: 'step0', icon: 'sparkles', label: 'Before You Start', route: 'before-you-start' },
   { id: 'enroll', icon: 'user-plus', label: 'Enrollment', route: 'welcome' },
+  { id: 'select-region', icon: 'map', label: 'Select Region', route: 'select-region' },
   {
     id: 'step1', icon: 'file-search', label: 'Step 1 · Problem ID', route: 'phase-1-intro',
     sub: [
@@ -99,9 +100,9 @@ const PAREA_NAV = [
   { id: 'workfile', icon: 'folder-open', label: 'Workfile', route: 'workfile' },
   { id: 'divider2', divider: true },
   { id: 'tools-label', sectionLabel: 'Tools' },
-  { id: 'mls', icon: 'building-2', label: 'MLS Search', route: 'mls' },
-  { id: 'inspection', icon: 'scan-eye', label: 'Inspect & Sketch', route: 'inspection' },
-  { id: 'urar-report', icon: 'clipboard-list', label: 'URAR Report', route: 'urar-report' },
+  { id: 'mls', icon: 'building-2', label: 'McKissock MLS', route: 'mls' },
+  { id: 'inspection', icon: 'scan-eye', label: 'McKissock Inspect', route: 'inspection' },
+  { id: 'urar-report', icon: 'clipboard-list', label: 'McKissock UAD', route: 'urar-report' },
 ];
 
 function PAREASidebar({ active, onNav, collapsed }) {
@@ -226,107 +227,135 @@ function PAREASidebar({ active, onNav, collapsed }) {
 // ── Socratic AI Panel ─────────────────────────────────────────────
 const AI_SCREENS = new Set(['engagement-letter','preliminary-research','inspection-scheduling','market-analysis','hbu','comp-selection','adjustment-grid','valuation','reconciliation','report-writing']);
 
-function SocraticPanel({ open, onToggle, route }) {
-  const [shaking, setShaking] = useState(false);
-  const prevRoute = useRef(route);
-  const [messages, setMessages] = useState([
-    { from: 'ai', text: "Ready. Navigate to any assignment screen and I'll ask you a Socratic question to sharpen your thinking." }
-  ]);
+const SOCRATIC_PROMPTS = {
+  'before-you-start': { headline: "Before tools touch your work", body: "AI doesn't think like a human. Your <em>perspective</em>, your <em>opinion</em>, and how you <em>validate</em> them — that's what an appraiser is paid for. Acknowledge each premise; then we'll begin.", chips: ['Why this matters'] },
+  'mentors-corner':   { headline: "Async means async", body: "James drops videos on his cadence, not yours. Skim the new uploads, but don't expect a video to answer a question that only your mentor review can.", chips: ['Browse new uploads'] },
+  'office-hours':     { headline: "Office hours are scheduled — not on-demand", body: "Live sessions are for thinking out loud together. Per-assignment feedback still comes through Mentor Reviews — don't conflate the two.", chips: ['Add to my calendar'] },
+  'home':             { headline: "Pick up where you left off", body: "You're in <strong>Step 4 · Comp Selection</strong> — the highest-judgment screen in the program. Open it when you have 45 focused minutes. Before you do: which neighborhood factor weighs most in this market?", chips: ['Resume Comp Selection', 'Why this matters'] },
+  'welcome':          { headline: "Why are you here?", body: "Most folks come to PAREA because they can't find a supervisor. Be honest with yourself: do you want a license, or do you want the trade? Your answer changes how hard the next 8 weeks feel.", chips: ['I want the trade', 'I need the license'] },
+  'tech-setup':       { headline: "Tools are a means", body: "PropMix, True Footage, Apex — these don't make you an appraiser. Your <em>judgment</em> does. Each tool will try to give you an answer. Your job is to push back.", chips: ['Got it'] },
+  'select-region':    { headline: "Work where you'll actually work", body: "Pick the region you intend to appraise in — your listings, comps, and market data are drawn from it. Not sure yet? The <strong>Central Texas</strong> default is fine; you can change it anytime.", chips: ['Use the default'] },
+  'phase-1-intro':    { headline: "Problem identification is everything", body: "Most bad reports trace back to a fuzzy problem statement. Before you click into the lessons: what is an appraisal <em>for</em>?", chips: ['Mortgage decision', 'Risk transfer', 'Both'] },
+  'ethics-lesson':    { headline: "Ethics isn't a quiz", body: "USPAP Conduct is the only thing standing between you and a board complaint. The scenarios get harder. Don't memorize — think.", chips: ['Start scenario'] },
+  'tool-orientation': { headline: "Don't trust the tool", body: "PropMix will hand you 47 comps and rank them. Before you accept its top pick, ask: <strong>does this rank reflect <em>my</em> market or its training data?</strong>", chips: ['Show me an example'] },
+  'engagement-letter':    { headline: "Six scope elements", body: "USPAP requires intended use, user, effective date, type/definition of value, relevant characteristics, and assignment conditions. Miss one and your report has no legal footing.", chips: ['Check my draft', 'Why each one?'] },
+  'preliminary-research': { headline: "What's your preliminary read?", body: "Based on your desk research, is this market <strong>declining, stable, or increasing</strong>? Back it up with one data point.", chips: ['Increasing — DOM ↓', 'Stable — STL ~100%', 'Declining'] },
+  'inspection-scheduling':{ headline: "Plan for what you can't see", body: "Tenant occupancy. Locked outbuildings. Aggressive dog. What's your contingency if you can't access the basement?", chips: ['Note it', 'Reschedule'] },
+  'mentor-review-1':  { headline: "What will James push on?", body: "He sees 1 flag from the pre-screen. Predict the question before he asks it.", chips: ['USPAP edition', 'Scope tightness'] },
+  'phase-2-launch':   { headline: "The case is real", body: "4218 Ridgewood Ln is a 2010 contemporary. Lender wants market value for purchase. The seller's agent will be on-site. What do you bring?", chips: ['Open the case file'] },
+  'property-research':    { headline: "Three sources, one answer", body: "Public record GLA, MLS GLA, and what you measure rarely agree. Which one rules — and why?", chips: ['What I measure', 'It depends'] },
+  'virtual-inspection':   { headline: "Defend your trend call", body: "You noted the neighborhood trend as <em>stable</em>. What MLS data point supports that? If you don't have one yet, we'll get it in Market Analysis — flag it.", chips: ['DOM data', 'STL ratio', 'Flag for later'] },
+  'gla-measurement':  { headline: "ANSI Z765 is the standard", body: "Measure to the exterior. Bay windows count if floor-to-ceiling and ≥ 7'. Open to below doesn't count. Make a habit.", chips: ['Cheatsheet'] },
+  'sketch':           { headline: "The sketch is a legal document", body: "If it disagrees with your narrative, the narrative loses. Re-check perimeter before you save.", chips: ['Recheck', 'Save'] },
+  'mentor-review-2':  { headline: "Defend your GLA", body: "Predict the question: 'You measured 2,184 — assessor says 2,210. Which one goes in the report?'", chips: ['Mine', 'Note both'] },
+  'market-analysis':  { headline: "Trend ≠ vibe", body: "DOM, sale-to-list, inventory months. Pick the two that tell the cleanest story for this market.", chips: ['DOM + STL', 'Inventory + STL'] },
+  'hbu':              { headline: "All four tests", body: "Legally permissible · physically possible · financially feasible · maximally productive. Skip one and HBU is wrong by definition.", chips: ['Walk me through'] },
+  'mentor-review-3':  { headline: "HBU is where junior appraisers slip", body: "Most argue maximally productive without showing financial feasibility. Don't.", chips: ['Show me an example'] },
+  'comp-selection':   { headline: "Defend C3 over C4", body: "You picked <strong>C1, C2, C3</strong>. C4 has a higher AI score (87) than C3 (78). Walk me through why C3 made the cut over C4.", chips: ['Age + bed/bath match', 'Distance', 'Counter the AI'] },
+  'mentor-review-4':  { headline: "Comp selection = the whole report", body: "If your three comps are wrong, nothing downstream matters. James will spend most of his 20 min here.", chips: ['Run pre-check'] },
+  'adjustment-grid':  { headline: "Net & gross adjustment limits", body: "Net ≤ 15%, gross ≤ 25%. If you bust either, your comp is too dissimilar — or your adjustment is wrong.", chips: ['Show my totals'] },
+  'cost-approach':    { headline: "Marshall & Swift, not your gut", body: "Cost approach is its own discipline. Use the published cost data; show your depreciation math.", chips: ['Pull data'] },
+  'income-approach':  { headline: "It's OK to skip — if you defend it", body: "1-unit residential, owner-occupied market, no rental comps. State why <em>this</em> property doesn't need it.", chips: ['Write the rationale'] },
+  'mentor-review-5':  { headline: "Three approaches, one value", body: "Predict: 'Why did you weight Sales Comparison 100%?'", chips: ['Market evidence', 'Lender expectation'] },
+  'reconciliation':   { headline: "Reconciliation is judgment", body: "Don't average. Defend a single number with the most credible approach.", chips: ['Walk through'] },
+  'mentor-review-6':  { headline: "The number you submit", body: "James will ask 'why $612,500 and not $610,000?' Have an answer that isn't 'it felt right'.", chips: ['Prep answer'] },
+  'report-writing':   { headline: "URAR is form, not formality", body: "Every blank is meaningful. Skip nothing. The narrative tells the story the form can't.", chips: ['Start draft'] },
+  'workfile':         { headline: "5-year workfile retention", body: "Everything you used, every override you rejected, every conversation with this AI. State Board can ask for it.", chips: ['Assemble'] },
+  'mentor-review-7':  { headline: "Final read-through", body: "Read your report aloud. If you stumble, the reader will too.", chips: ['Done reading'] },
+  'capstone':         { headline: "Client pushback isn't personal", body: "The lender's questions feel adversarial — they're not. Answer with USPAP and data, not defense.", chips: ['Run the sim'] },
+  'mentor-review-8':  { headline: "One report down", body: "Report 1 of 8. The next one is faster. The 8th feels routine. That's the compression curve working.", chips: ['Mark complete'] },
+};
+
+function SocraticPanel({ collapsed, onToggle, route, shake }) {
+  const accent = '#d60436';
+  const p = SOCRATIC_PROMPTS[route] || SOCRATIC_PROMPTS['home'];
   const [input, setInput] = useState('');
 
-  useEffect(() => {
-    if (prevRoute.current !== route && AI_SCREENS.has(route)) {
-      setShaking(true);
-      const t = setTimeout(() => setShaking(false), 800);
-      prevRoute.current = route;
-      return () => clearTimeout(t);
-    }
-    prevRoute.current = route;
-  }, [route]);
-
-  const send = () => {
-    if (!input.trim()) return;
-    const userMsg = input;
-    setMessages(m => [...m, { from: 'user', text: userMsg }]);
-    setInput('');
-    setTimeout(() => {
-      setMessages(m => [...m, { from: 'ai', text: "That's a reasonable read. But push one level deeper — what market mechanism supports that conclusion? Cite a data point." }]);
-    }, 800);
-  };
+  if (collapsed) {
+    return (
+      <aside className={shake ? 'socratic-attention' : ''} style={{
+        width: 44, flexShrink: 0,
+        background: 'linear-gradient(180deg, #1a1d2b, #2a1d3a)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        padding: '14px 0', gap: 14, borderLeft: '1px solid #2a2d3b',
+      }}>
+        <button onClick={onToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#fff', padding: 6 }} title="Open Socratic AI">
+          <Icon name="message-square" size={18} color="#fff" />
+        </button>
+        <div style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 10, fontWeight: 800, color: '#cbd0e0', letterSpacing: '.15em', textTransform: 'uppercase', marginTop: 8 }}>Socratic AI</div>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: accent, boxShadow: `0 0 6px ${accent}`, animation: 'pulse 1.6s ease-in-out infinite', marginTop: 'auto', marginBottom: 12 }} />
+      </aside>
+    );
+  }
 
   return (
-    <>
-      <button onClick={onToggle} title="Socratic AI"
-        style={{
-          position: 'fixed', right: open ? 320 : 0, top: '50%', transform: 'translateY(-50%)',
-          background: '#1a1d2b', color: '#fff', border: 'none', cursor: 'pointer',
-          padding: '14px 7px', borderRadius: '8px 0 0 8px',
-          boxShadow: '-2px 0 12px rgba(0,0,0,0.18)',
-          zIndex: 200, transition: 'right 250ms ease',
-          animation: shaking ? 'shake 0.6s ease' : 'none',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6
-        }}>
-        <Icon name="sparkles" size={16} color="#d60436" />
-        <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', writingMode: 'vertical-rl', color: '#b0b8cc' }}>AI</span>
-      </button>
-
-      {open && (
-        <div style={{
-          position: 'fixed', right: 0, top: 0, bottom: 0, width: 320,
-          background: '#1a1d2b', display: 'flex', flexDirection: 'column',
-          zIndex: 150, boxShadow: '-4px 0 20px rgba(0,0,0,0.25)',
-          animation: 'slideInRight 200ms ease both'
-        }}>
-          <div style={{ padding: '16px 18px', borderBottom: '1px solid #2a2d3b', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg, #d60436, #ff5577)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="sparkles" size={16} color="#fff" />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13.5, fontWeight: 800, color: '#fff', fontFamily: "'Nunito', sans-serif" }}>Socratic AI</div>
-              <div style={{ fontSize: 10, color: '#888' }}>Asks. Never tells.</div>
-            </div>
-            <button onClick={onToggle} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4 }}>
-              <Icon name="x" size={16} color="#888" />
-            </button>
-          </div>
-          <div style={{ flex: 1, overflow: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {messages.map((m, i) => (
-              <div key={i} style={{ display: 'flex', gap: 8, flexDirection: m.from === 'user' ? 'row-reverse' : 'row', alignItems: 'flex-start' }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                  background: m.from === 'ai' ? 'linear-gradient(135deg, #d60436, #ff5577)' : 'rgba(255,255,255,0.1)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 10, fontWeight: 800, color: '#fff'
-                }}>{m.from === 'ai' ? 'AI' : 'S'}</div>
-                <div style={{
-                  maxWidth: '80%', padding: '9px 12px', borderRadius: 10,
-                  borderTopLeftRadius: m.from === 'user' ? 10 : 3,
-                  borderTopRightRadius: m.from === 'user' ? 3 : 10,
-                  background: m.from === 'user' ? '#d60436' : 'rgba(255,255,255,0.07)',
-                  color: '#fff', fontSize: 12.5, lineHeight: 1.5
-                }}>{m.text}</div>
-              </div>
-            ))}
-          </div>
-          <div style={{ padding: '12px 14px', borderTop: '1px solid #2a2d3b', display: 'flex', gap: 8 }}>
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && send()}
-              placeholder="Respond…"
-              style={{
-                flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-                borderRadius: 7, padding: '9px 12px', color: '#fff', fontSize: 12.5,
-                fontFamily: 'inherit', outline: 'none'
-              }}
-            />
-            <button onClick={send} style={{ background: '#d60436', border: 'none', cursor: 'pointer', padding: '0 12px', borderRadius: 7, display: 'flex', alignItems: 'center' }}>
-              <Icon name="send" size={13} color="#fff" />
-            </button>
-          </div>
+    <aside style={{
+      width: 300, flexShrink: 0,
+      background: 'linear-gradient(180deg, #1a1d2b 0%, #2a1d3a 100%)',
+      color: '#fff', display: 'flex', flexDirection: 'column',
+      borderLeft: '1px solid #2a2d3b',
+    }}>
+      <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, background: `linear-gradient(135deg, ${accent}, #ff5577)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="sparkles" size={14} color="#fff" />
         </div>
-      )}
-    </>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.005em' }}>Socratic AI</div>
+          <div style={{ fontSize: 10, color: '#cbd0e0', letterSpacing: '.04em' }}>Your AI mentor partner</div>
+        </div>
+        <button onClick={onToggle} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', color: '#cbd0e0', padding: 5, borderRadius: 5, display: 'flex' }} title="Collapse">
+          <Icon name="chevron-right" size={13} color="#cbd0e0" />
+        </button>
+      </div>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 10px' }}>
+        <div style={{ background: `linear-gradient(135deg, ${accent}22, transparent 65%)`, border: `1px solid ${accent}44`, borderRadius: 10, padding: '12px 14px', marginBottom: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <span style={{ width: 5, height: 5, borderRadius: '50%', background: accent, animation: 'pulse 1.6s ease-in-out infinite' }} />
+            <span style={{ fontSize: 9.5, fontWeight: 800, color: '#ff8da3', letterSpacing: '.1em', textTransform: 'uppercase' }}>Question for you</span>
+          </div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff', lineHeight: 1.35, marginBottom: 8, fontFamily: "'Nunito', sans-serif" }} dangerouslySetInnerHTML={{ __html: p.headline }} />
+          <div style={{ fontSize: 12, color: '#cbd0e0', lineHeight: 1.55 }} dangerouslySetInnerHTML={{ __html: p.body }} />
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
+          {(p.chips || []).map((c, i) => (
+            <button key={i} style={{
+              background: i === 0 ? 'rgba(214,4,54,0.16)' : 'rgba(255,255,255,0.04)',
+              border: i === 0 ? `1px solid ${accent}88` : '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 7, padding: '9px 11px', textAlign: 'left',
+              color: i === 0 ? '#fff' : '#cbd0e0', fontFamily: 'inherit', fontSize: 11.5,
+              cursor: 'pointer', fontWeight: i === 0 ? 600 : 500,
+            }}>{c}</button>
+          ))}
+        </div>
+
+        <div style={{ fontSize: 10, fontWeight: 800, color: '#888', letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 8 }}>Recent thinking</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {[['You defended HBU against AI pushback','2h ago'],['Comp #4 challenged: 0.6mi too far','4h ago'],['Engagement letter approved','Yesterday']].map(([txt, ts], i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, padding: '8px 10px', background: 'rgba(255,255,255,0.03)', borderRadius: 6, fontSize: 11, color: '#cbd0e0', lineHeight: 1.4 }}>
+              <Icon name="git-commit-horizontal" size={12} color="#888" />
+              <div style={{ flex: 1 }}>
+                <div>{txt}</div>
+                <div style={{ fontSize: 10, color: '#777', marginTop: 1 }}>{ts}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ padding: '10px 12px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="Ask anything…"
+          style={{ flex: 1, background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '8px 10px', borderRadius: 6, fontFamily: 'inherit', fontSize: 12, outline: 'none' }}
+        />
+        <button style={{ background: accent, border: 'none', cursor: 'pointer', color: '#fff', width: 32, height: 32, borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name="arrow-up" size={14} color="#fff" />
+        </button>
+      </div>
+    </aside>
   );
 }
 
@@ -625,12 +654,129 @@ function S_Capstone({ navigate }) {
   );
 }
 
+// ── Select Region ────────────────────────────────────────────────
+const REGION_KEY = 'parea_region_v1';
+const REGION_DEFAULT = 'central-texas';
+const REGIONS = [
+  { id: 'pacific-nw',    name: 'Pacific Northwest',     blurb: 'Seattle · Portland · Boise · Anchorage',       states: ['WA','OR','ID','AK'] },
+  { id: 'california',    name: 'California & Nevada',   blurb: 'Los Angeles · Bay Area · Las Vegas · Honolulu', states: ['CA','NV','HI'] },
+  { id: 'mountain-west', name: 'Mountain West',         blurb: 'Denver · Salt Lake City · Billings',           states: ['MT','WY','UT','CO'] },
+  { id: 'southwest',     name: 'Southwest',             blurb: 'Phoenix · Tucson · Albuquerque',               states: ['AZ','NM'] },
+  { id: 'central-texas', name: 'Central Texas',         blurb: 'Austin · San Antonio · Waco corridor',         states: ['TX'] },
+  { id: 'great-plains',  name: 'Great Plains',          blurb: 'Omaha · Wichita · Oklahoma City',              states: ['ND','SD','NE','KS','OK'] },
+  { id: 'great-lakes',   name: 'Great Lakes & Midwest', blurb: 'Chicago · Detroit · Minneapolis · Columbus',   states: ['MN','WI','IA','MO','IL','IN','MI','OH'] },
+  { id: 'southeast',     name: 'Southeast',             blurb: 'Atlanta · Nashville · Miami · Charlotte',      states: ['AR','LA','MS','AL','TN','KY','GA','SC','NC','FL'] },
+  { id: 'mid-atlantic',  name: 'Mid-Atlantic',          blurb: 'Philadelphia · Pittsburgh · DC metro',         states: ['VA','WV','MD','DE','PA','NJ'] },
+  { id: 'northeast',     name: 'Northeast',             blurb: 'New York City · Boston · Hartford',            states: ['NY','CT','RI','MA','VT','NH','ME'] },
+];
+const REGION_OF = Object.fromEntries(REGIONS.flatMap(r => r.states.map(s => [s, r.id])));
+const STATE_GRID = {
+  AK:[0,0],                                                                                                           ME:[10,0],
+                                                                                                  VT:[9,1],           NH:[10,1],
+  WA:[0,2], ID:[1,2], MT:[2,2], ND:[3,2], MN:[4,2], IL:[5,2], WI:[6,2],             MI:[8,2],   NY:[9,2],           RI:[10,2],
+  OR:[0,3], NV:[1,3], WY:[2,3], SD:[3,3], IA:[4,3], IN:[5,3], OH:[6,3], PA:[7,3],   NJ:[8,3],   CT:[9,3],           MA:[10,3],
+  CA:[0,4], UT:[1,4], CO:[2,4], NE:[3,4], MO:[4,4], KY:[5,4], WV:[6,4], VA:[7,4],   MD:[8,4],   DE:[9,4],
+            AZ:[1,5], NM:[2,5], KS:[3,5], AR:[4,5], TN:[5,5], NC:[6,5], SC:[7,5],
+  HI:[0,6],                     OK:[3,6], LA:[4,6], MS:[5,6], AL:[6,6], GA:[7,6],
+                                TX:[3,7],                               FL:[8,7],
+};
+
+function USRegionMap({ selected, onPick }) {
+  const GREEN = '#1f9d57', GREEN_D = '#178347';
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(11, 1fr)', gridTemplateRows: 'repeat(8, 1fr)', gap: 4, width: '100%', aspectRatio: '11 / 8' }}>
+      {Object.entries(STATE_GRID).map(([abbr, [col, row]]) => {
+        const reg = REGION_OF[abbr];
+        const isSel = reg === selected;
+        return (
+          <button key={abbr} onClick={() => reg && onPick(reg)} title={REGIONS.find(r => r.id === reg)?.name}
+            style={{
+              gridColumn: col + 1, gridRow: row + 1,
+              background: isSel ? GREEN : '#eceef1', color: isSel ? '#fff' : '#9aa1ab',
+              border: isSel ? `1px solid ${GREEN_D}` : '1px solid transparent',
+              borderRadius: 5, cursor: 'pointer', padding: 0,
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 9.5, fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              transition: 'background 120ms, color 120ms',
+            }}>{abbr}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+function S_SelectRegion({ navigate }) {
+  const [region, setRegion] = useState(() => { try { return localStorage.getItem(REGION_KEY) || REGION_DEFAULT; } catch { return REGION_DEFAULT; } });
+  const pick = (id) => { try { localStorage.setItem(REGION_KEY, id); } catch {} setRegion(id); };
+  const current = REGIONS.find(r => r.id === region) || REGIONS.find(r => r.id === REGION_DEFAULT);
+  return (
+    <div style={{ maxWidth: 980, margin: '0 auto' }}>
+      <PageHeader breadcrumb={['Enrollment']} title="Select your region"
+        subtitle="Selecting your region helps us show you listings and comps that are relevant to where you actually work. Pick the area you intend to practice in — if you're unsure, leave it on the Central Texas default and change it later." />
+      <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 1fr', gap: 20, alignItems: 'start' }}>
+        <Card padding={22}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div style={{ fontSize: 12.5, fontWeight: 800, color: '#292929', fontFamily: "'Nunito', sans-serif" }}>United States · market regions</div>
+            <div style={{ display: 'flex', gap: 14, fontSize: 10.5, color: '#888' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 11, height: 11, borderRadius: 3, background: '#1f9d57' }} /> Your region</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}><span style={{ width: 11, height: 11, borderRadius: 3, background: '#eceef1' }} /> Other</span>
+            </div>
+          </div>
+          <USRegionMap selected={region} onPick={pick} />
+          <div style={{ marginTop: 16, padding: '12px 14px', borderRadius: 9, background: '#eafaf0', border: '1px solid #bce9cf', display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: '#1f9d57', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Icon name="map-pin" size={15} color="#fff" />
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: '#13703d', fontFamily: "'Nunito', sans-serif" }}>{current.name}</div>
+              <div style={{ fontSize: 11, color: '#3f8a60' }}>{current.blurb}</div>
+            </div>
+            <Badge color="success">Saved</Badge>
+          </div>
+        </Card>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: '#888', letterSpacing: '.07em', textTransform: 'uppercase', marginBottom: 10 }}>Choose a region</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+            {REGIONS.map(r => {
+              const on = r.id === region;
+              return (
+                <button key={r.id} onClick={() => pick(r.id)} style={{
+                  display: 'flex', alignItems: 'center', gap: 12, width: '100%', textAlign: 'left',
+                  padding: '11px 13px', borderRadius: 9, cursor: 'pointer', fontFamily: 'inherit',
+                  background: on ? '#eafaf0' : '#fff',
+                  border: on ? '1.5px solid #1f9d57' : '1px solid #e8e8e8',
+                  transition: 'border-color 120ms, background 120ms',
+                }}>
+                  <div style={{ width: 22, height: 22, borderRadius: '50%', flexShrink: 0, border: on ? '6px solid #1f9d57' : '2px solid #ccd2da', transition: 'border 120ms' }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: on ? '#13703d' : '#292929' }}>
+                      {r.name}{r.id === REGION_DEFAULT && <span style={{ fontSize: 10, fontWeight: 700, color: '#999', marginLeft: 7 }}>· default</span>}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#888', marginTop: 1 }}>{r.blurb}</div>
+                  </div>
+                  {on && <Icon name="check-circle-2" size={17} color="#1f9d57" />}
+                </button>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button variant="primary" size="lg" onClick={() => navigate('tech-setup')}>
+              Continue to Tech Setup <Icon name="arrow-right" size={14} color="#fff" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Route → Screen ────────────────────────────────────────────────
 function renderScreen(route, navigate, tweaks) {
   const p = { navigate, tweaks };
   switch (route) {
     case 'before-you-start': return <S00_BeforeYouStart {...p} />;
     case 'welcome': return <S01_Enrollment {...p} />;
+    case 'select-region': return <S_SelectRegion {...p} />;
     case 'tech-setup': return <S02_TechSetup {...p} />;
     case 'home': return <S03_Dashboard {...p} />;
     case 'phase-1-intro': return <S04_Phase1Intro {...p} />;
@@ -680,24 +826,37 @@ export default function App() {
       return pts.every(k => acked[k]) ? 'home' : 'before-you-start';
     } catch { return 'before-you-start'; }
   });
+  const [screenKey, setScreenKey] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-  const [aiOpen, setAiOpen] = useState(false);
+  const [socrCollapsed, setSocrCollapsed] = useState(true);
+  const [socrShake, setSocrShake] = useState(false);
   const [textbookTopic, setTextbookTopic] = useState(null);
   const tweaks = { aiIntensity: 'normal', uspapStrict: 'normal', showCohortFeed: true };
 
-  const navigate = r => setRoute(r);
+  const navigate = r => {
+    setRoute(r);
+    setScreenKey(k => k + 1);
+    if (socrCollapsed) {
+      setSocrShake(true);
+      setTimeout(() => setSocrShake(false), 800);
+    }
+  };
   window.__openTextbook = setTextbookTopic;
+
+  const isFull = FULL_HEIGHT_ROUTES.includes(route);
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden', background: '#f4f5f7', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
       <PAREASidebar active={route} onNav={navigate} collapsed={sidebarCollapsed} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', marginRight: aiOpen ? 320 : 0, transition: 'margin-right 250ms ease' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <AppTopBar onMenuToggle={() => setSidebarCollapsed(c => !c)} collapsed={sidebarCollapsed} />
-        <div style={{ flex: 1, overflow: FULL_HEIGHT_ROUTES.includes(route) ? 'hidden' : 'auto', padding: FULL_HEIGHT_ROUTES.includes(route) ? 0 : '24px 28px 80px' }}>
-          {renderScreen(route, navigate, tweaks)}
+        <div style={{ flex: 1, overflow: isFull ? 'hidden' : 'auto', padding: isFull ? 0 : '24px 28px 80px' }}>
+          <div key={screenKey} className={isFull ? undefined : 'screen-enter'} style={isFull ? { height: '100%' } : undefined}>
+            {renderScreen(route, navigate, tweaks)}
+          </div>
         </div>
       </div>
-      <SocraticPanel open={aiOpen} onToggle={() => setAiOpen(o => !o)} route={route} />
+      <SocraticPanel collapsed={socrCollapsed} onToggle={() => setSocrCollapsed(c => !c)} route={route} shake={socrShake} />
       {textbookTopic && <TextbookModal topic={textbookTopic} onClose={() => setTextbookTopic(null)} />}
     </div>
   );
