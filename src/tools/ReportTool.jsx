@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 
-// ─── UAD 3.6 Dynamic URAR – True Footage Embedded Report ───────────────────
+// ─── UAD 3.6 Dynamic URAR – McKissock Report Embedded Report ───────────────────
 // All 29 URAR sections; conditional sections appear based on property data.
 
 
@@ -1002,7 +1002,7 @@ export default function ReportTool() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <div style={{ width: 28, height: 28, background: '#3b82f6', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 11, flexShrink: 0 }}>TF</div>
             <div>
-              <div style={{ fontWeight: 700, fontSize: 12 }}>True Footage</div>
+              <div style={{ fontWeight: 700, fontSize: 12 }}>McKissock Report</div>
               <div style={{ fontSize: 9, color: '#64748b' }}>UAD 3.6 Dynamic URAR</div>
             </div>
           </div>

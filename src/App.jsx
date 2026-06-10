@@ -47,6 +47,7 @@ const PAREA_NAV = [
   // ── Introduction ─────────────────────────────────────────────────
   { id: 'div-intro', divider: true },
   { id: 'sec-intro', sectionLabel: 'Introduction', sectionIcon: 'compass' },
+  { id: 'welcome-intro', icon: 'smile',     label: 'Welcome',          route: 'welcome-intro' },
   { id: 'step0',       icon: 'sparkles',    label: 'Before You Start', route: 'before-you-start' },
   { id: 'enroll',      icon: 'user-plus',   label: 'Enrollment',       route: 'welcome' },
   { id: 'select-region',icon: 'map',        label: 'Select Region',    route: 'select-region' },
@@ -57,9 +58,9 @@ const PAREA_NAV = [
   { id: 'sec-practice', sectionLabel: 'Practice', sectionIcon: 'dumbbell' },
   { id: 'pr-m1', icon: 'target',         label: 'M1 · Problem ID',       route: 'pr-m1', sub: [{ route: 'pr-m1-a', label: 'a · Instructional' }, { route: 'pr-m1-b', label: 'b · Experiential' }] },
   { id: 'pr-m2', icon: 'layers',         label: 'M2 · Scope of Work',    route: 'pr-m2', sub: [{ route: 'pr-m2-a', label: 'a · Instructional' }, { route: 'pr-m2-b', label: 'b · Experiential' }] },
-  { id: 'pr-m3', icon: 'database',       label: 'M3 · Data Collection',  route: 'pr-m3-a', sub: [{ route: 'pr-m3-a', label: 'a · Instructional · MLS' }, { route: 'pr-m3-b', label: 'b · McKissock Inspect' }, { route: 'pr-m3-c', label: 'c · Experiential' }] },
+  { id: 'pr-m3', icon: 'database',       label: 'M3 · Data Collection',  highlight: true, route: 'pr-m3-a', sub: [{ route: 'pr-m3-a', label: 'a · Instructional · MLS' }, { route: 'pr-m3-b', label: 'b · McKissock Inspect' }, { route: 'pr-m3-c', label: 'c · Experiential' }] },
   { id: 'pr-m4', icon: 'building-2',     label: 'M4 · HBU',              route: 'pr-m4', sub: [{ route: 'pr-m4-a', label: 'a · Instructional' }, { route: 'pr-m4-b', label: 'b · Experiential' }] },
-  { id: 'pr-m5', icon: 'bar-chart-2',    label: 'M5 · Sales Comparison', route: 'pr-m5', sub: [{ route: 'pr-m5-a', label: 'a · Instructional' }, { route: 'pr-m5-b', label: 'b · Experiential' }] },
+  { id: 'pr-m5', icon: 'bar-chart-2',    label: 'M5 · Sales Comparison', highlight: true, route: 'pr-m5', sub: [{ route: 'pr-m5-a', label: 'a · Instructional' }, { route: 'pr-m5-b', label: 'b · Experiential' }] },
   { id: 'pr-m6', icon: 'hammer',         label: 'M6 · Cost Approach',    route: 'pr-m6', sub: [{ route: 'pr-m6-a', label: 'a · Instructional' }, { route: 'pr-m6-b', label: 'b · Experiential' }] },
   { id: 'pr-m7', icon: 'trending-up',    label: 'M7 · Income Approach',  route: 'pr-m7', sub: [{ route: 'pr-m7-a', label: 'a · Instructional' }, { route: 'pr-m7-b', label: 'b · Experiential' }] },
   { id: 'pr-m8', icon: 'git-merge',      label: 'M8 · Reconciliation',   route: 'pr-m8', sub: [{ route: 'pr-m8-a', label: 'a · Instructional' }, { route: 'pr-m8-b', label: 'b · Experiential' }] },
@@ -70,7 +71,7 @@ const PAREA_NAV = [
   { id: 'sec-final', sectionLabel: 'Final', sectionIcon: 'trophy' },
   {
     id: 'report-1', icon: 'file-text', label: 'Report 1 · Conv. Purchase', route: 'phase-1-intro',
-    matchRoutes: REPORT_1_ROUTES,
+    highlight: true, matchRoutes: REPORT_1_ROUTES,
     sub: [
       { route: 'phase-1-intro',  label: 'Step 1 · Problem ID' },
       { route: 'phase-2-launch', label: 'Step 2 · Inspection' },
@@ -84,6 +85,7 @@ const PAREA_NAV = [
   },
   { id: 'report-2', icon: 'file-text', label: 'Report 2', route: 'report-2' },
   { id: 'report-3', icon: 'file-text', label: 'Report 3', route: 'report-3' },
+  { id: 'program-complete', icon: 'award', label: 'Program Complete', route: 'program-complete' },
 
   // ── Tools ─────────────────────────────────────────────────────────
   { id: 'div-tools', divider: true },
@@ -93,7 +95,58 @@ const PAREA_NAV = [
   { id: 'urar-report',icon: 'clipboard-list',label: 'McKissock UAD',     route: 'urar-report' },
 ];
 
+// Collapsible section IDs
+const COLLAPSIBLE_SECTS = new Set(['sec-intro', 'sec-practice', 'sec-final']);
+
+// Map each nav item id → which section it belongs to (computed once)
+const ITEM_SECTION = (() => {
+  const map = {};
+  let curr = null;
+  for (const item of PAREA_NAV) {
+    if (COLLAPSIBLE_SECTS.has(item.id)) {
+      curr = item.id;
+    } else if (item.sectionLabel && !COLLAPSIBLE_SECTS.has(item.id)) {
+      curr = null; // Tools section — not collapsible
+    } else if (!item.divider && curr) {
+      map[item.id] = curr;
+    }
+  }
+  return map;
+})();
+
 function PAREASidebar({ active, onNav, collapsed }) {
+  const bg = '#fff', text = '#444', textMuted = '#888', brand = '#d60436', activeBg = '#fff0f3';
+
+  // Determine which section contains the active route
+  const getActiveSect = (r) => {
+    for (const item of PAREA_NAV) {
+      const sect = ITEM_SECTION[item.id];
+      if (!sect) continue;
+      if (item.route === r || item.matchRoutes?.has(r) || item.sub?.some(s => s.route === r)) return sect;
+    }
+    if (REPORT_1_ROUTES.has(r)) return 'sec-final';
+    return null;
+  };
+
+  // Sections start collapsed; auto-expand the one containing the active route
+  const [sectionsOpen, setSectionsOpen] = useState(() => {
+    const s = getActiveSect(active);
+    return s ? new Set([s]) : new Set();
+  });
+
+  useEffect(() => {
+    const s = getActiveSect(active);
+    if (s) setSectionsOpen(prev => new Set([...prev, s]));
+  }, [active]);
+
+  const toggleSection = (sectId) => {
+    setSectionsOpen(prev => {
+      const next = new Set(prev);
+      if (next.has(sectId)) next.delete(sectId); else next.add(sectId);
+      return next;
+    });
+  };
+
   const [expanded, setExpanded] = useState(() => {
     for (const item of PAREA_NAV) {
       if (!item.sub && !item.matchRoutes) continue;
@@ -103,12 +156,6 @@ function PAREASidebar({ active, onNav, collapsed }) {
     }
     return null;
   });
-
-  const bg = '#fff';
-  const text = '#444';
-  const textMuted = '#888';
-  const brand = '#d60436';
-  const activeBg = '#fff0f3';
 
   const isActive = (item) => {
     if (item.route === active) return true;
@@ -131,15 +178,41 @@ function PAREASidebar({ active, onNav, collapsed }) {
           }
           if (item.sectionLabel) {
             if (collapsed) return null;
+            const isCollapsible = COLLAPSIBLE_SECTS.has(item.id);
+            if (!isCollapsible) {
+              return (
+                <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '10px 10px 3px', marginTop: 2 }}>
+                  {item.sectionIcon && <Icon name={item.sectionIcon} size={11} color={textMuted} />}
+                  <div style={{ fontSize: 9.5, fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{item.sectionLabel}</div>
+                </div>
+              );
+            }
+            const isOpen = sectionsOpen.has(item.id);
             return (
-              <div key={item.id} style={{ display: 'flex', alignItems: 'center', gap: 5, padding: '10px 10px 3px', marginTop: 2 }}>
+              <button key={item.id} onClick={() => toggleSection(item.id)}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 5, padding: '10px 10px 3px', marginTop: 2,
+                  background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left',
+                  fontFamily: 'inherit', borderRadius: 5,
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#f4f5f7'}
+                onMouseLeave={e => e.currentTarget.style.background = 'none'}
+              >
                 {item.sectionIcon && <Icon name={item.sectionIcon} size={11} color={textMuted} />}
-                <div style={{ fontSize: 9.5, fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.1em' }}>{item.sectionLabel}</div>
-              </div>
+                <div style={{ fontSize: 9.5, fontWeight: 800, color: textMuted, textTransform: 'uppercase', letterSpacing: '0.1em', flex: 1 }}>{item.sectionLabel}</div>
+                <Icon name={isOpen ? 'chevron-down' : 'chevron-right'} size={10} color={textMuted} />
+              </button>
             );
           }
+
+          // Hide items whose section is collapsed
+          const sect = ITEM_SECTION[item.id];
+          if (sect && !sectionsOpen.has(sect)) return null;
+
           const active_ = isActive(item);
           const isExpanded = expanded === item.id && !collapsed;
+          const isHighlight = item.highlight && !active_;
+
           return (
             <div key={item.id}>
               <button
@@ -157,7 +230,8 @@ function PAREASidebar({ active, onNav, collapsed }) {
                   padding: collapsed ? '9px 0' : '7px 10px',
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   borderRadius: 7, border: 'none', cursor: 'pointer',
-                  fontFamily: 'inherit', fontSize: 12.5, fontWeight: active_ ? 700 : 400,
+                  fontFamily: 'inherit', fontSize: 12.5,
+                  fontWeight: active_ ? 700 : isHighlight ? 700 : 400,
                   background: active_ ? activeBg : 'transparent',
                   color: active_ ? brand : text,
                   transition: 'background 120ms, color 120ms', textAlign: 'left', width: '100%',
@@ -221,7 +295,7 @@ function PAREASidebar({ active, onNav, collapsed }) {
   );
 }
 
-// ── Socratic AI Panel ─────────────────────────────────────────────
+// ── Ruby Panel ─────────────────────────────────────────────
 const AI_SCREENS = new Set(['engagement-letter','preliminary-research','inspection-scheduling','market-analysis','hbu','comp-selection','adjustment-grid','valuation','reconciliation','report-writing']);
 
 const SOCRATIC_PROMPTS = {
@@ -230,11 +304,11 @@ const SOCRATIC_PROMPTS = {
   'office-hours':     { headline: "Office hours are scheduled — not on-demand", body: "Live sessions are for thinking out loud together. Per-assignment feedback still comes through Mentor Reviews — don't conflate the two.", chips: ['Add to my calendar'] },
   'home':             { headline: "Pick up where you left off", body: "You're in <strong>Step 4 · Comp Selection</strong> — the highest-judgment screen in the program. Open it when you have 45 focused minutes. Before you do: which neighborhood factor weighs most in this market?", chips: ['Resume Comp Selection', 'Why this matters'] },
   'welcome':          { headline: "Why are you here?", body: "Most folks come to PAREA because they can't find a supervisor. Be honest with yourself: do you want a license, or do you want the trade? Your answer changes how hard the next 8 weeks feel.", chips: ['I want the trade', 'I need the license'] },
-  'tech-setup':       { headline: "Tools are a means", body: "PropMix, True Footage, Apex — these don't make you an appraiser. Your <em>judgment</em> does. Each tool will try to give you an answer. Your job is to push back.", chips: ['Got it'] },
+  'tech-setup':       { headline: "Tools are a means", body: "McKissock MLS, McKissock Report, McKissock Inspect — these don't make you an appraiser. Your <em>judgment</em> does. Each tool will try to give you an answer. Your job is to push back.", chips: ['Got it'] },
   'select-region':    { headline: "Work where you'll actually work", body: "Pick the region you intend to appraise in — your listings, comps, and market data are drawn from it. Not sure yet? The <strong>Central Texas</strong> default is fine; you can change it anytime.", chips: ['Use the default'] },
   'phase-1-intro':    { headline: "Problem identification is everything", body: "Most bad reports trace back to a fuzzy problem statement. Before you click into the lessons: what is an appraisal <em>for</em>?", chips: ['Mortgage decision', 'Risk transfer', 'Both'] },
   'ethics-lesson':    { headline: "Ethics isn't a quiz", body: "USPAP Conduct is the only thing standing between you and a board complaint. The scenarios get harder. Don't memorize — think.", chips: ['Start scenario'] },
-  'tool-orientation': { headline: "Don't trust the tool", body: "PropMix will hand you 47 comps and rank them. Before you accept its top pick, ask: <strong>does this rank reflect <em>my</em> market or its training data?</strong>", chips: ['Show me an example'] },
+  'tool-orientation': { headline: "Don't trust the tool", body: "McKissock MLS will hand you 47 comps and rank them. Before you accept its top pick, ask: <strong>does this rank reflect <em>my</em> market or its training data?</strong>", chips: ['Show me an example'] },
   'engagement-letter':    { headline: "Six scope elements", body: "USPAP requires intended use, user, effective date, type/definition of value, relevant characteristics, and assignment conditions. Miss one and your report has no legal footing.", chips: ['Check my draft', 'Why each one?'] },
   'preliminary-research': { headline: "What's your preliminary read?", body: "Based on your desk research, is this market <strong>declining, stable, or increasing</strong>? Back it up with one data point.", chips: ['Increasing — DOM ↓', 'Stable — STL ~100%', 'Declining'] },
   'inspection-scheduling':{ headline: "Plan for what you can't see", body: "Tenant occupancy. Locked outbuildings. Aggressive dog. What's your contingency if you can't access the basement?", chips: ['Note it', 'Reschedule'] },
@@ -271,7 +345,7 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
   if (collapsed) {
     return (
       <aside className={shake ? 'socratic-attention' : ''} onClick={onToggle}
-        title="Open Socratic AI"
+        title="Open Ruby"
         style={{
           width: 44, flexShrink: 0, cursor: 'pointer',
           background: 'linear-gradient(180deg, #1a1d2b, #2a1d3a)',
@@ -296,7 +370,7 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
             writingMode: 'vertical-rl', transform: 'rotate(180deg)',
             fontSize: 9, fontWeight: 800, color: '#ff8da3',
             letterSpacing: '.12em', textTransform: 'uppercase',
-          }}>Socratic AI</div>
+          }}>Ruby</div>
           <span style={{
             width: 7, height: 7, borderRadius: '50%',
             background: accent, boxShadow: `0 0 8px ${accent}`,
@@ -319,7 +393,7 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
           <Icon name="sparkles" size={14} color="#fff" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.005em' }}>Socratic AI</div>
+          <div style={{ fontSize: 12.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.005em' }}>Ruby</div>
           <div style={{ fontSize: 10, color: '#cbd0e0', letterSpacing: '.04em' }}>Your AI mentor partner</div>
         </div>
         <button onClick={onToggle} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', color: '#cbd0e0', padding: 5, borderRadius: 5, display: 'flex' }} title="Collapse">
@@ -413,6 +487,64 @@ function AppTopBar({ onMenuToggle, collapsed }) {
   );
 }
 
+// ── Welcome / Motivational screen ────────────────────────────────
+function S_WelcomeIntro({ navigate }) {
+  return (
+    <div style={{ maxWidth: 780, margin: '0 auto' }}>
+      <div style={{ textAlign: 'center', padding: '36px 0 28px' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'linear-gradient(90deg, #d60436, #ff5577)', color: '#fff', padding: '6px 18px', borderRadius: 999, fontSize: 11, fontWeight: 800, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 20 }}>
+          <Icon name="sparkles" size={13} color="#fff" /> McKissock PAREA
+        </div>
+        <h1 style={{ fontFamily: "'Nunito', sans-serif", fontSize: 38, fontWeight: 800, color: '#292929', margin: '0 0 14px', lineHeight: 1.15 }}>
+          You made it here for a reason.
+        </h1>
+        <p style={{ fontSize: 16, color: '#555', lineHeight: 1.65, maxWidth: 580, margin: '0 auto 28px' }}>
+          Most aspiring appraisers never find a supervisor. You found something better — a structured path that builds the same judgment, the same discipline, and the same professional standing.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 28 }}>
+        {[
+          { icon: 'file-text', color: '#d60436', bg: '#fff0f3', title: '3 Real Reports', body: 'Complete three full URAR appraisals from problem ID through final delivery — each one graded by a certified mentor.' },
+          { icon: 'user-check', color: '#1a9e5c', bg: '#edfbf4', title: '24 Mentor Reviews', body: 'James Mendel, MAI will review every critical decision point. Async turnaround in 48 hours.' },
+          { icon: 'sparkles', color: '#0a6ed1', bg: '#eef5ff', title: 'Ruby — Your AI Partner', body: 'Ruby asks the questions your mentor will ask — before they ask them. She builds your thinking, not your answers.' },
+        ].map(({ icon, color, bg, title, body }) => (
+          <div key={title} style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 12, padding: 20 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Icon name={icon} size={20} color={color} />
+            </div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#292929', marginBottom: 6, fontFamily: "'Nunito', sans-serif" }}>{title}</div>
+            <div style={{ fontSize: 12.5, color: '#666', lineHeight: 1.55 }}>{body}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background: 'linear-gradient(120deg, #1a1d2b 0%, #2a1d3a 100%)', borderRadius: 14, padding: '24px 28px', color: '#fff', marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 10, background: 'linear-gradient(135deg, #d60436, #ff5577)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Icon name="message-circle" size={20} color="#fff" />
+          </div>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 800, color: '#ff8da3', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 6 }}>A note before you begin</div>
+            <p style={{ fontSize: 14, color: '#e8eaf0', lineHeight: 1.65, margin: 0 }}>
+              PAREA is not self-study. It's a practicum. The AI won't do your thinking — it will challenge yours. Every decision you make in this program has to be one you can defend to a state board. That standard is the point.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+        <Button variant="primary" size="lg" onClick={() => navigate('before-you-start')}>
+          Begin the program <Icon name="arrow-right" size={15} color="#fff" />
+        </Button>
+        <Button variant="ghost" size="lg" onClick={() => navigate('home')}>
+          Go to Dashboard
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 // ── Stub / new screens ────────────────────────────────────────────
 function S_AdjustmentGrid({ navigate }) {
   const [cells, setCells] = useState({
@@ -436,7 +568,7 @@ function S_AdjustmentGrid({ navigate }) {
       <div style={{ marginBottom: 14 }}>
         <TextbookCallout topic="adjustments" why="Net ≤15% · Gross ≤25% of unadjusted sale — know this before you fill a single cell." />
       </div>
-      <WorkfileCaptureButton step="p5" label="Adjustment grid · paired-sales derivation" source="PropMix + own analysis" />
+      <WorkfileCaptureButton step="p5" label="Adjustment grid · paired-sales derivation" source="McKissock MLS + own analysis" />
       <Card padding={0} style={{ overflow: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5 }}>
           <thead>
@@ -515,7 +647,7 @@ function S_Valuation({ navigate }) {
             ))}
           </div>
           <div style={{ background: '#1a1d2b', borderRadius: 8, padding: 16, color: '#fff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><AIChip label="Socratic" tone="brand" size="sm" /></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><AIChip label="Ruby" tone="brand" size="sm" /></div>
             <div style={{ fontSize: 12.5, lineHeight: 1.55, color: '#e8eaf0' }}>Three adjusted values around $482–483K. Which comp carries the most weight, and why?</div>
           </div>
         </Card>
@@ -572,9 +704,9 @@ function S_ReportWriting({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 7']} title="Report writing — URAR"
-        subtitle="Drafting the full URAR (Form 1004) in True Footage." />
-      <WorkfileCaptureButton step="p7" label="URAR draft · True Footage" source="True Footage" />
-      <MockToolFrame tool="True Footage" tab="URAR Form 1004" height={480}>
+        subtitle="Drafting the full URAR (Form 1004) in McKissock Report." />
+      <WorkfileCaptureButton step="p7" label="URAR draft · McKissock Report" source="McKissock Report" />
+      <MockToolFrame tool="McKissock Report" tab="URAR Form 1004" height={480}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           {[['Subject Address','4218 Ridgewood Lane, Glenmoor, OH 44023'],['Borrower','Redacted'],['Lender','First Summit Bank'],['Effective Date','March 14, 2026'],['Property Type','Single-Family Detached'],['Form','URAR (Fannie Mae 1004)'],['Opinion of Value','$488,000'],['Approaches Used','Sales Comparison + Cost'],].map(([k,v],i) => (
             <div key={i} style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 5, padding: '8px 10px' }}>
@@ -640,7 +772,121 @@ function S_MentorReviewStub({ n, step, prevRoute, nextRoute, navigate }) {
   );
 }
 
-function S_Capstone({ navigate }) {
+function S_ClientCommunication({ navigate }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    setMessages(m => [...m, { from: 'user', text: input }]);
+    setInput('');
+  };
+
+  return (
+    <div>
+      <PageHeader breadcrumb={['Step 8']} title="Communication — Delivering the Report"
+        subtitle="The loan officer has received your completed appraisal. She has questions. Answer with USPAP and data — not defensiveness." />
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 16 }}>
+        {/* Chat pane */}
+        <Card padding={0}>
+          <div style={{ padding: '14px 18px', borderBottom: '1px solid #f0f0f0', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src={PERSONAS.maya.avatar} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 13.5, fontWeight: 700 }}>{PERSONAS.maya.name}</div>
+              <div style={{ fontSize: 11, color: '#888' }}>{PERSONAS.maya.role}</div>
+            </div>
+            <AIChip label="AI Persona" tone="brand" size="sm" />
+          </div>
+          <div style={{ padding: 16, height: 440, overflow: 'auto', background: '#fafbfc' }}>
+            <ChatBubble from="persona" name={PERSONAS.maya.name} role="Loan Officer" time="2:04 PM" avatar={PERSONAS.maya.avatar}>
+              Got the report — thank you. Quick question: the value came in at <strong>$488,000</strong> but the contract is at <strong>$505,000</strong>. My underwriter is going to ask questions. Can you walk me through why?
+            </ChatBubble>
+            <ChatBubble from="ai" name="Ruby" time="2:05 PM">
+              Before you respond — this is the moment that tests your independence. Maya's tone is professional, not adversarial, but the pressure is real. What's your obligation here under USPAP Ethics?
+            </ChatBubble>
+            <ChatBubble from="persona" name={PERSONAS.maya.name} role="Loan Officer" time="2:07 PM" avatar={PERSONAS.maya.avatar}>
+              Also — my borrower's agent says there was a similar unit in the building that sold for $510K last month. Shouldn't that be a comp?
+            </ChatBubble>
+            <ChatBubble from="ai" name="Ruby" time="2:08 PM">
+              Good challenge. You need to address this specifically — either explain why you considered and rejected it, or acknowledge the error and issue an addendum. Which is it?
+            </ChatBubble>
+            {messages.map((m, i) => (
+              <ChatBubble key={i} from={m.from === 'user' ? 'user' : 'ai'} name={m.from === 'user' ? 'You' : 'Ruby'} time="Now">
+                {m.text}
+              </ChatBubble>
+            ))}
+            <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontSize: 11, color: '#888' }}>Maya is reviewing…</span>
+              <span style={{ display: 'inline-flex', gap: 3 }}>
+                {[0,1,2].map(i => <span key={i} style={{ width: 5, height: 5, borderRadius: '50%', background: '#888', animation: `pulse 1s ease-in-out ${i * 0.15}s infinite` }} />)}
+              </span>
+            </div>
+          </div>
+          <div style={{ padding: 14, borderTop: '1px solid #f0f0f0', display: 'flex', gap: 8 }}>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSend()}
+              placeholder="Type your response to Maya…"
+              style={{ flex: 1, padding: '10px 12px', border: '1px solid #e8e8e8', borderRadius: 8, fontSize: 13.5, fontFamily: 'inherit', background: '#fafafa', outline: 'none' }}
+            />
+            <Button variant="primary" size="sm" onClick={handleSend}><Icon name="send" size={13} color="#fff" /></Button>
+          </div>
+        </Card>
+
+        {/* Guidance pane */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <Card padding={20}>
+            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>What you're defending</div>
+            {[
+              { label: 'Final opinion of value', value: '$488,000', color: '#d60436' },
+              { label: 'Primary approach', value: 'Sales Comparison', color: '#1a9e5c' },
+              { label: 'Comps used', value: 'C1, C2, C3 — all same sub-market', color: '#0a6ed1' },
+            ].map(({ label, value, color }) => (
+              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+                <span style={{ fontSize: 12, color: '#888' }}>{label}</span>
+                <span style={{ fontSize: 12.5, fontWeight: 700, color }}>{value}</span>
+              </div>
+            ))}
+          </Card>
+
+          <Card padding="16px 18px" style={{ background: '#1a1d2b', color: '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+              <div style={{ width: 26, height: 26, borderRadius: 6, background: 'linear-gradient(135deg, #d60436, #ff5577)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name="sparkles" size={13} color="#fff" />
+              </div>
+              <span style={{ fontSize: 12.5, fontWeight: 700 }}>Ruby's coaching</span>
+            </div>
+            <p style={{ fontSize: 12, color: '#cbd0e0', lineHeight: 1.6, margin: 0 }}>
+              Client pushback on value is not personal. Your job is to explain the market, not defend the number. Lead with the comp data. If the contract-sale spread surprises you, it should surprise them too — for the right reasons.
+            </p>
+          </Card>
+
+          <Card padding={16}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 10 }}>USPAP obligations in this conversation</div>
+            {[
+              { ok: true,  label: 'No direction in value (Ethics Rule)' },
+              { ok: true,  label: 'Report stands as issued unless error found' },
+              { ok: false, label: 'Addendum required if new material fact emerges' },
+            ].map((r, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', background: r.ok ? '#edfbf4' : '#fff8ec', borderRadius: 5, marginBottom: 4, fontSize: 12 }}>
+                <Icon name={r.ok ? 'check-circle' : 'alert-circle'} size={13} color={r.ok ? '#1a9e5c' : '#e8860a'} />
+                <span style={{ color: r.ok ? '#1a9e5c' : '#e8860a', fontWeight: 600 }}>{r.label}</span>
+              </div>
+            ))}
+          </Card>
+
+          <Button variant="primary" onClick={() => navigate('mentor-review-8')}>
+            Submit · Mentor Review 8 <Icon name="arrow-right" size={14} color="#fff" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function S_ProgramComplete({ navigate }) {
   return (
     <div style={{ maxWidth: 840, margin: '0 auto' }}>
       <div style={{ textAlign: 'center', padding: '32px 0 20px' }}>
@@ -805,12 +1051,12 @@ const PRACTICE_MODULES = [
     tools: [] },
   { id: 3, route: 'pr-m3', icon: 'database',
     title: 'Collection and Analysis of Data',
-    instructional: 'McKissock MLS — trainees search for comparable listings and sales, filter by property type, and analyze market trends for each of the 4 properties. McKissock Inspect — trainees conduct a virtual walkthrough via Matterport for each property, record condition/quality ratings, and produce a floor plan sketch.',
+    instructional: 'McKissock MLS — trainees search for comparable listings and sales, filter by property type, and analyze market trends for each of the 4 properties. McKissock Inspect — trainees conduct a virtual walkthrough for each property, record condition/quality ratings, and produce a floor plan sketch.',
     experiential: 'Physically visit a property and complete a structured field worksheet (condition, quality, measurements). Pull the same property\'s public record from the County Assessor website and compare findings.',
     tools: ['mls', 'inspection'], inline: true,
     toolActivities: {
       mls: 'Search for comparable listings and sales for each of the 4 properties. Filter by property type, price range, and proximity. Save 3+ comp candidates per property and note days on market, list-to-sale ratios, and neighborhood trends.',
-      inspection: 'Conduct a virtual walkthrough via the Matterport viewer. Record condition ratings (C1–C6) and quality ratings (Q1–Q6) for each property. Produce a floor plan sketch and calculate GLA using the ANSI Z765 standard.',
+      inspection: 'Conduct a virtual walkthrough via McKissock Inspect. Record condition ratings (C1–C6) and quality ratings (Q1–Q6) for each property. Produce a floor plan sketch and calculate GLA using the ANSI Z765 standard.',
     } },
   { id: 4, route: 'pr-m4', icon: 'building-2',
     title: 'Determination of Highest and Best Use',
@@ -1037,7 +1283,9 @@ function renderScreen(route, navigate, tweaks) {
     case 'uspap-checklist': return <S_USPAPChecklistScreen {...p} />;
     case 'mentor-review-7': return <S_MentorReviewStub n={7} step={7} prevRoute="report-writing" nextRoute="capstone" {...p} />;
     case 'mentor-review-8': return <S_MentorReviewStub n={8} step={8} prevRoute="capstone" nextRoute={null} {...p} />;
-    case 'capstone': return <S_Capstone {...p} />;
+    case 'capstone': return <S_ClientCommunication {...p} />;
+    case 'program-complete': return <S_ProgramComplete {...p} />;
+    case 'welcome-intro': return <S_WelcomeIntro {...p} />;
     case 'mentors-corner': return <S_MentorsCorner {...p} />;
     case 'office-hours': return <S_OfficeHours {...p} />;
     case 'workfile': return <S30b_Workfile {...p} />;
@@ -1191,7 +1439,7 @@ const STEP_TOOLS = {
   // Step 7 — tools are now embedded inline as tabs
   'uspap-checklist':   ['urar-report'],
   'mentor-review-7':   ['urar-report'],
-  'capstone':          ['workfile'],
+  'capstone':          ['urar-report', 'workfile'],
   'mentor-review-8':   ['workfile'],
 };
 
@@ -1234,13 +1482,7 @@ function StepToolsBar({ tools, navigate }) {
 }
 
 export default function App() {
-  const [route, setRoute] = useState(() => {
-    try {
-      const acked = JSON.parse(localStorage.getItem('parea_acknowledged_preamble_v1') || '{}');
-      const pts = ['ai-not-human','human-value','tools-are-tools','verify-credibility','workfile-evidence'];
-      return pts.every(k => acked[k]) ? 'home' : 'before-you-start';
-    } catch { return 'before-you-start'; }
-  });
+  const [route, setRoute] = useState('home');
   const [screenKey, setScreenKey] = useState(0);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [socrCollapsed, setSocrCollapsed] = useState(true);

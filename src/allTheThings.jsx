@@ -616,7 +616,7 @@ function ChatBubble({ from, name, avatar, role, time, children, accent }) {
             <span style={{ fontWeight: 700, color: '#292929' }}>{name}</span>
             {role && <span>{role}</span>}
             {time && <span>· {time}</span>}
-            {isAI && from === 'ai' && <AIChip label="Socratic" size="sm" tone="dark" />}
+            {isAI && from === 'ai' && <AIChip label="Ruby" size="sm" tone="dark" />}
           </div>
         }
         <div style={{
@@ -636,17 +636,16 @@ function ChatBubble({ from, name, avatar, role, time, children, accent }) {
 
 }
 
-// ── MockToolFrame (PropMix / True Footage / Apex Sketch chrome) ─
-function MockToolFrame({ tool = 'PropMix', tab, children, height = 380, status = 'live' }) {
+// ── MockToolFrame (McKissock MLS / McKissock Report / McKissock Inspect chrome) ─
+function MockToolFrame({ tool = 'McKissock MLS', tab, children, height = 380, status = 'live' }) {
   const tools = {
-    PropMix: { color: '#0a6ed1', bg: '#eaf3ff', accent: '#0a6ed1', logo: 'P' },
-    'True Footage': { color: '#1f6f5b', bg: '#e8f5ef', accent: '#1f6f5b', logo: 'T' },
-    'Apex Sketch': { color: '#6f3fb5', bg: '#f0e9fb', accent: '#6f3fb5', logo: 'A' },
-    'CoreLogic': { color: '#0066b3', bg: '#e6f1fa', accent: '#0066b3', logo: 'C' },
-    'HouseCanary': { color: '#16a34a', bg: '#e7f8ee', accent: '#16a34a', logo: 'H' },
-    'Matterport': { color: '#0a85ff', bg: '#e6f1ff', accent: '#0a85ff', logo: 'M' }
+    'McKissock MLS':     { color: '#0a6ed1', bg: '#eaf3ff', accent: '#0a6ed1', logo: 'M' },
+    'McKissock Report':  { color: '#1f6f5b', bg: '#e8f5ef', accent: '#1f6f5b', logo: 'M' },
+    'McKissock Inspect': { color: '#0a85ff', bg: '#e6f1ff', accent: '#0a85ff', logo: 'M' },
+    'CoreLogic':    { color: '#0066b3', bg: '#e6f1fa', accent: '#0066b3', logo: 'C' },
+    'HouseCanary':  { color: '#16a34a', bg: '#e7f8ee', accent: '#16a34a', logo: 'H' },
   };
-  const t = tools[tool] || tools.PropMix;
+  const t = tools[tool] || tools['McKissock MLS'];
   return (
     <div style={{
       border: '1px solid #d8d8d8', borderRadius: 10, overflow: 'hidden',
@@ -743,7 +742,7 @@ const COHORT_FEED = [
 { name: 'Amara K.', avatar: 'https://i.pravatar.cc/64?img=47', action: 'submitted Report 1 for Mentor Review 8', phase: 'p8', time: '12 min ago' },
 { name: 'Takeshi R.', avatar: 'https://i.pravatar.cc/64?img=12', action: 'completed Adjustment Grid · 4 overrides defended', phase: 'p5', time: '38 min ago' },
 { name: 'Priya N.', avatar: 'https://i.pravatar.cc/64?img=45', action: 'cleared Mentor Review 3 (Market & HBU)', phase: 'p3', time: '1 hr ago' },
-{ name: 'Diego A.', avatar: 'https://i.pravatar.cc/64?img=33', action: 'finalized GLA in Apex Sketch · 2,148 sq ft', phase: 'p2', time: '2 hr ago' },
+{ name: 'Diego A.', avatar: 'https://i.pravatar.cc/64?img=33', action: 'finalized GLA in McKissock Inspect · 2,148 sq ft', phase: 'p2', time: '2 hr ago' },
 { name: 'Lena O.', avatar: 'https://i.pravatar.cc/64?img=49', action: 'opened comp selection · MLS scan', phase: 'p4', time: '3 hr ago' },
 { name: 'Marcus P.', avatar: 'https://i.pravatar.cc/64?img=15', action: 'AI flagged USPAP SR1-3 · revising HBU', phase: 'p3', time: '4 hr ago' },
 { name: 'Yuki T.', avatar: 'https://i.pravatar.cc/64?img=44', action: 'started Report 2 · FHA Refinance', phase: 'p1', time: '5 hr ago' }];
@@ -1010,7 +1009,7 @@ const MCKISSOCK_TEXTBOOK = {
   'tool-credibility': {
     chapter: 'Ch. 11 · Working With Data Tools',
     section: 'Verifying Third-Party Outputs',
-    summary: 'Appraisers may use tools — PropMix, True Footage, Apex, Matterport, AVMs, AI suggestions — to assemble and analyze data. The appraiser remains responsible for the credibility of every figure in the report.',
+    summary: 'Appraisers may use tools — McKissock MLS, McKissock Report, McKissock Inspect, AVMs, AI suggestions — to assemble and analyze data. The appraiser remains responsible for the credibility of every figure in the report.',
     keyPoints: [
     'The tool is not the appraiser',
     'No tool is USPAP-compliant — only the appraiser\'s use of it is',
@@ -1173,9 +1172,8 @@ function TextbookModal({ topic, onClose }) {
 // ═══════════════════════════════════════════════════════════
 function VerifyThisCallout({ tool, claim, verifySteps, compact }) {
   const toolColors = {
-    'PropMix': '#0a6ed1', 'True Footage': '#1f6f5b', 'Apex Sketch': '#6f3fb5',
-    'Apex': '#6f3fb5', 'Matterport': '#0a85ff', 'CoreLogic': '#0066b3',
-    'HouseCanary': '#16a34a', 'AI': '#d60436', 'AVM': '#0066b3'
+    'McKissock MLS': '#0a6ed1', 'McKissock Report': '#1f6f5b', 'McKissock Inspect': '#0a85ff',
+    'CoreLogic': '#0066b3', 'HouseCanary': '#16a34a', 'AI': '#d60436', 'AVM': '#0066b3'
   };
   const tc = toolColors[tool] || '#d60436';
   return (
@@ -1254,9 +1252,9 @@ function loadWorkfile() {
   // Seed with a few entries so the dashboard card isn't empty on first load
   return {
     'report-1': [
-    { id: 'wf-seed-1', step: 'p1', label: 'Engagement letter draft', source: 'True Footage', kind: 'document', ts: Date.now() - 2 * 86400000 },
-    { id: 'wf-seed-2', step: 'p1', label: 'PropMix subject property card', source: 'PropMix', kind: 'screenshot', ts: Date.now() - 86400000 },
-    { id: 'wf-seed-3', step: 'p2', label: 'Apex sketch · subject GLA reconciled', source: 'Apex Sketch', kind: 'screenshot', ts: Date.now() - 12 * 3600000 }],
+    { id: 'wf-seed-1', step: 'p1', label: 'Engagement letter draft', source: 'McKissock Report', kind: 'document', ts: Date.now() - 2 * 86400000 },
+    { id: 'wf-seed-2', step: 'p1', label: 'McKissock MLS subject property card', source: 'McKissock MLS', kind: 'screenshot', ts: Date.now() - 86400000 },
+    { id: 'wf-seed-3', step: 'p2', label: 'Apex sketch · subject GLA reconciled', source: 'McKissock Inspect', kind: 'screenshot', ts: Date.now() - 12 * 3600000 }],
 
     'report-2': [],
     'report-3': []
@@ -1892,7 +1890,7 @@ function S_MentorsCorner({ navigate }) {
 // ═══════════════════════════════════════════════════════════
 const OFFICE_HOURS = [
 { id: 'oh-1', title: 'Cohort 04 · Open Office Hours', date: 'Thu, Mar 19, 2026', time: '3:00 PM – 4:00 PM ET', topic: 'Open Q&A · bring your stuck points', zoom: 'https://zoom.us/j/85274938102', meetingId: '852 7493 8102', recurring: 'Recurring · every Thursday' },
-{ id: 'oh-2', title: 'Comp Selection Clinic', date: 'Tue, Mar 24, 2026', time: '1:00 PM – 2:00 PM ET', topic: 'Bring your top 5 PropMix candidates · we debate them live', zoom: 'https://zoom.us/j/85274938102', meetingId: '852 7493 8102', recurring: 'One-time · Step 4 deep dive' },
+{ id: 'oh-2', title: 'Comp Selection Clinic', date: 'Tue, Mar 24, 2026', time: '1:00 PM – 2:00 PM ET', topic: 'Bring your top 5 McKissock MLS candidates · we debate them live', zoom: 'https://zoom.us/j/85274938102', meetingId: '852 7493 8102', recurring: 'One-time · Step 4 deep dive' },
 { id: 'oh-3', title: 'Cohort 04 · Open Office Hours', date: 'Thu, Mar 26, 2026', time: '3:00 PM – 4:00 PM ET', topic: 'Open Q&A · bring your stuck points', zoom: 'https://zoom.us/j/85274938102', meetingId: '852 7493 8102', recurring: 'Recurring · every Thursday' },
 { id: 'oh-4', title: 'Reconciliation & Report Writing', date: 'Wed, Apr 1, 2026', time: '11:00 AM – 12:30 PM ET', topic: 'Walk through a finished URAR end-to-end · narrative tightening', zoom: 'https://zoom.us/j/85274938102', meetingId: '852 7493 8102', recurring: 'One-time · Steps 6–7' },
 { id: 'oh-5', title: 'Cohort 04 · Open Office Hours', date: 'Thu, Apr 2, 2026', time: '3:00 PM – 4:00 PM ET', topic: 'Open Q&A · bring your stuck points', zoom: 'https://zoom.us/j/85274938102', meetingId: '852 7493 8102', recurring: 'Recurring · every Thursday' }];
@@ -2046,7 +2044,7 @@ function S00_BeforeYouStart({ navigate }) {
   const points = [
   { id: 'ai-not-human', title: 'AI does not think like a human.', body: 'AI tools pattern-match across training data. They do not <em>see</em> the house, talk to the owner, or weigh local context. They will be confidently wrong.' },
   { id: 'human-value', title: 'Your human perspective is the irreplaceable part.', body: 'What an appraiser brings — and what tools cannot — is <em>judgment</em>: framing the problem, weighing conflicting evidence, forming and defending an opinion of value.' },
-  { id: 'tools-are-tools', title: 'PropMix, True Footage, Apex, Matterport, AI suggestions — these are tools.', body: 'Tools assemble data. They do not appraise. <strong>No tool is USPAP-compliant by itself.</strong> Only your <em>use</em> of a tool — verified, documented, and reasoned — can be USPAP-compliant.' },
+  { id: 'tools-are-tools', title: 'McKissock MLS, McKissock Report, McKissock Inspect, AI suggestions — these are tools.', body: 'Tools assemble data. They do not appraise. <strong>No tool is USPAP-compliant by itself.</strong> Only your <em>use</em> of a tool — verified, documented, and reasoned — can be USPAP-compliant.' },
   { id: 'verify-credibility', title: 'You will be expected to verify everything.', body: 'For every output you accept from a tool, you should know: what is the source? Can I reproduce it? What would make this wrong? Throughout the program, "Verify this" callouts will walk you through it.' },
   { id: 'workfile-evidence', title: 'Document evidence as you go.', body: 'Capture screenshots and notes into your workfile every time you pull from a tool or research site. If a state board asks you to defend a number five years from now, your workfile is your answer.' }];
 
@@ -2162,7 +2160,7 @@ function S30b_Workfile({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Cohort 04']} title="Workfile"
-      subtitle="Your evidence trail. Every screenshot, note, and source you capture from PropMix, True Footage, Apex, Matterport, or AI tools lives here. USPAP retention: 5 years." />
+      subtitle="Your evidence trail. Every screenshot, note, and source you capture from McKissock MLS, McKissock Report, McKissock Inspect, or AI tools lives here. USPAP retention: 5 years." />
 
       {/* Report selector */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
@@ -2305,7 +2303,7 @@ function S01_Enrollment({ navigate, tweaks }) {
           Licensed Residential Appraiser Path
         </h1>
         <p style={{ fontSize: 15, color: '#666', marginTop: 12, lineHeight: 1.55 }}>
-          A 6-month practicum with real tools (PropMix, True Footage, Apex Sketch),<br />
+          A 6-month practicum with real tools (McKissock MLS, McKissock Report, McKissock Inspect),<br />
           AI-graded checkpoints, and 1:20 mentor coverage. Three full USPAP reports — one certificate.
         </p>
       </div>
@@ -2412,9 +2410,9 @@ function S02_TechSetup({ navigate }) {
   const allDone = Object.values(connected).every(Boolean);
 
   const TOOLS = [
-  { id: 'propmix', name: 'PropMix', desc: 'Property data, MLS, public records, AVMs', color: '#0a6ed1', logo: 'P' },
-  { id: 'truefootage', name: 'True Footage', desc: 'Report writing, URAR forms, Marshall & Swift cost data', color: '#1f6f5b', logo: 'T' },
-  { id: 'apex', name: 'Apex Sketch', desc: 'Property sketches and GLA validation', color: '#6f3fb5', logo: 'A' }];
+  { id: 'propmix', name: 'McKissock MLS', desc: 'Property data, MLS, public records, AVMs', color: '#0a6ed1', logo: 'P' },
+  { id: 'truefootage', name: 'McKissock Report', desc: 'Report writing, URAR forms, Marshall & Swift cost data', color: '#1f6f5b', logo: 'T' },
+  { id: 'apex', name: 'McKissock Inspect', desc: 'Property sketches and GLA validation', color: '#6f3fb5', logo: 'A' }];
 
 
   return (
@@ -2473,8 +2471,8 @@ function S02_TechSetup({ navigate }) {
           </div>
           <ul style={{ marginTop: 12, paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {[
-            'Real PropMix MLS — same data the firm you join will use',
-            'Real True Footage URAR — your reports are firm-ready',
+            'Real McKissock MLS MLS — same data the firm you join will use',
+            'Real McKissock Report URAR — your reports are firm-ready',
             'Real Apex sketches — exportable to your workfile',
             'AI tracks every keystroke via xAPI · feeds your portfolio'].
             map((t, i) =>
@@ -2522,7 +2520,7 @@ function S03_Dashboard({ navigate, tweaks }) {
             Comp Selection — Report 1
           </h1>
           <p style={{ fontSize: 13.5, color: '#555', marginTop: 6, maxWidth: 560, lineHeight: 1.5 }}>
-            PropMix returned 47 candidates within your market boundary. AI scored them — your next move is to pick 3–5 and defend each selection against your Socratic AI partner.
+            McKissock MLS returned 47 candidates within your market boundary. AI scored them — your next move is to pick 3–5 and defend each selection against your Ruby partner.
           </p>
           <div style={{ display: 'flex', gap: 16, marginTop: 14, fontSize: 12, color: '#666' }}>
             <div><span style={{ color: '#d60436' }}>● </span><strong>~45 min</strong> est.</div>
@@ -2710,7 +2708,7 @@ function S04_Phase1Intro({ navigate }) {
             <ul style={{ paddingLeft: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
               <Step icon="shield" label="Appraiser independence & public trust" est="20 min" />
               <Step icon="book-open" label="USPAP introduction · Ethics Rule" est="30 min" />
-              <Step icon="tool" label="Tool orientation · PropMix, True Footage, Apex" est="20 min" />
+              <Step icon="tool" label="Tool orientation · McKissock MLS, McKissock Report, Apex" est="20 min" />
             </ul>
           </div>
           <div style={{ flexShrink: 0, alignSelf: 'flex-end' }}>
@@ -2871,23 +2869,23 @@ function S05_Ethics({ navigate }) {
 
 // ═══ SCREEN 6: Tool Orientation ══════════════════════════════
 function S06_ToolOrientation({ navigate }) {
-  const [tab, setTab] = useS1('PropMix');
-  const TOOLS = ['PropMix', 'True Footage', 'Apex Sketch'];
+  const [tab, setTab] = useS1('McKissock MLS');
+  const TOOLS = ['McKissock MLS', 'McKissock Report', 'McKissock Inspect'];
   const content = {
-    'PropMix': {
+    'McKissock MLS': {
       desc: 'Property data backbone. MLS, public records, AVMs, environmental overlays — all in one connected session.',
       uses: ['Pull subject property card + public records (Section IV)', 'Virtual neighborhood + site inspection (Sections V–VII)', 'Comp universe + AI match scoring (Section XIII)'],
       data: '47M+ properties · 600+ MLS feeds · refreshed nightly'
     },
-    'True Footage': {
+    'McKissock Report': {
       desc: 'Report writing platform. URAR forms, narrative templates, Marshall & Swift cost data, certification library.',
       uses: ['Draft full URAR appraisal report (Section XIX)', 'Marshall & Swift cost approach data (Section XV.B)', 'Certification & workfile assembly (Section XX)'],
       data: 'AQB-aligned · USPAP edition auto-versioned · workfile auto-archived'
     },
-    'Apex Sketch': {
+    'McKissock Inspect': {
       desc: 'Industry-standard sketching for residential. GLA validation, attached/detached structures, multi-level support.',
       uses: ['Subject property sketch (Section IX)', 'Error-correction exercises (Section IX)', 'GLA validation against measurements (Section VIII)'],
-      data: 'Direct API export to True Footage · GLA reconciliation built-in'
+      data: 'Direct API export to McKissock Report · GLA reconciliation built-in'
     }
   };
   const t = content[tab];
@@ -2969,7 +2967,7 @@ function S07_Engagement({ navigate, tweaks }) {
       <PageHeader breadcrumb={['Step 1', 'Section II.A']} title="Engagement letter — Maya Chen"
       subtitle="The AI plays the loan officer. Draft the engagement letter; she'll push back until the scope is USPAP-tight." />
 
-      <WorkfileGate step="p1" label="Engagement letter · Maya Chen sim transcript" source="Socratic AI + persona sim">
+      <WorkfileGate step="p1" label="Engagement letter · Maya Chen sim transcript" source="Ruby + persona sim">
         Capture this AI chat — every revision Maya forces and every push the AI makes belongs in your workfile.
       </WorkfileGate>
 
@@ -2991,7 +2989,7 @@ function S07_Engagement({ navigate, tweaks }) {
             <ChatBubble from="user" name="You" time="9:16 AM">
               Yes — sending an engagement letter now. I'll need access to inspect the property within the next 5 business days.
             </ChatBubble>
-            <ChatBubble from="ai" name="Socratic AI" time="9:17 AM">
+            <ChatBubble from="ai" name="Ruby" time="9:17 AM">
               Before you send — your draft is missing the <strong>USPAP edition in effect</strong> and doesn't address whether any extraordinary assumptions apply. The lender will accept the letter as-is, but your mentor will flag both. Add them?
             </ChatBubble>
             <ChatBubble from="persona" name={PERSONAS.maya.name} role="Loan Officer" time="9:21 AM" avatar={PERSONAS.maya.avatar}>
@@ -3089,12 +3087,12 @@ function S08_PrelimResearch({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 1', 'Section II.C']} title="Preliminary research"
-      subtitle="Desk research before inspection. Pull public records, zoning, flood, and a quick MLS scan from PropMix." />
+      subtitle="Desk research before inspection. Pull public records, zoning, flood, and a quick MLS scan from McKissock MLS." />
 
-      <WorkfileCaptureButton step="p1" label="Preliminary research · PropMix card + zoning + flood + MLS scan" source="PropMix public records" />
+      <WorkfileCaptureButton step="p1" label="Preliminary research · McKissock MLS card + zoning + flood + MLS scan" source="McKissock MLS public records" />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16 }}>
-        <MockToolFrame tool="PropMix" tab="public-records" height={520}>
+        <MockToolFrame tool="McKissock MLS" tab="public-records" height={520}>
           <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, marginBottom: 14 }}>
             <img src={SUBJECT.photo} style={{ width: 110, height: 84, borderRadius: 8, objectFit: 'cover' }} />
             <div style={{ flex: 1 }}>
@@ -3169,7 +3167,7 @@ function S08_PrelimResearch({ navigate }) {
 
           <Card padding={0} style={{ background: '#1a1d2b', color: '#fff' }}>
             <div style={{ padding: '14px 16px', borderBottom: '1px solid #2a2d3b', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <AIChip label="Socratic" tone="brand" size="sm" />
+              <AIChip label="Ruby" tone="brand" size="sm" />
               <span style={{ fontSize: 12, color: '#cbd0e0' }}>One question before you advance</span>
             </div>
             <div style={{ padding: 16 }}>
@@ -3230,7 +3228,7 @@ function S09_InspectionScheduling({ navigate }) {
           <ChatBubble from="user" name="You" time="2:13 PM">
             Got it — basement is rented. How about <strong>Friday at 10am</strong>? That gives you and Lily two days notice. I'll need access to all interior spaces including the basement unit.
           </ChatBubble>
-          <ChatBubble from="ai" name="Socratic AI" time="2:14 PM">
+          <ChatBubble from="ai" name="Ruby" time="2:14 PM">
             Good catch on the tenant — note this in your workfile, it may affect highest & best use. One more thing to confirm: <strong>day-of contact number</strong>, and <strong>any access restrictions</strong> (gates, dogs, alarms).
           </ChatBubble>
           <ChatBubble from="persona" name="David Osei" role="Homeowner" time="2:18 PM" avatar={PERSONAS.david.avatar}>
@@ -3492,7 +3490,7 @@ function S12_CaseDrop({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Report 1', 'Step 2 · Inspection']} title="Assignment dropped"
-      subtitle="Mentor Review 1 cleared. Here's the full property card — pulled live from PropMix. Today's plan is AI-tailored to your pace." />
+      subtitle="Mentor Review 1 cleared. Here's the full property card — pulled live from McKissock MLS. Today's plan is AI-tailored to your pace." />
 
       {/* Estimates banner — at the top */}
       <Card padding="14px 18px" style={{ marginBottom: 14, background: 'linear-gradient(90deg, #fafbfc, #fff)' }}>
@@ -3560,7 +3558,7 @@ function S12_CaseDrop({ navigate }) {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {[
-              ['Pull public records & zoning (PropMix)', '45 min', 'database'],
+              ['Pull public records & zoning (McKissock MLS)', '45 min', 'database'],
               ['Virtual neighborhood inspection', '1.5 hr', 'map'],
               ['Start improvements inspection', '2 hr', 'home']].
               map(([t, time, ic], i) =>
@@ -3574,7 +3572,7 @@ function S12_CaseDrop({ navigate }) {
               )}
             </div>
             <Button variant="primary" fullWidth onClick={() => navigate('property-research')} style={{ marginTop: 12 }}>
-              Accept & open PropMix <Icon name="arrow-right" size={13} color="#fff" />
+              Accept & open McKissock MLS <Icon name="arrow-right" size={13} color="#fff" />
             </Button>
           </Card>
         </div>
@@ -3583,17 +3581,17 @@ function S12_CaseDrop({ navigate }) {
 
 }
 
-// ═══ SCREEN 13: Property Research (PropMix split) ════════════
+// ═══ SCREEN 13: Property Research (McKissock MLS split) ════════════
 function S13_PropertyResearch({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 2', 'Section IV']} title="Property & site research"
-      subtitle="PropMix on the left · your data-entry form on the right. AI cross-checks every entry against the source data." />
+      subtitle="McKissock MLS on the left · your data-entry form on the right. AI cross-checks every entry against the source data." />
 
-      <WorkfileCaptureButton step="p2" label="PropMix property card · 4218 Ridgewood Ln" source="PropMix public records" />
+      <WorkfileCaptureButton step="p2" label="McKissock MLS property card · 4218 Ridgewood Ln" source="McKissock MLS public records" />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16 }}>
-        <MockToolFrame tool="PropMix" tab="property-card" height={500}>
+        <MockToolFrame tool="McKissock MLS" tab="property-card" height={500}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
             ['LEGAL DESCRIPTION', 'Lot 14, Block 22, Glenmoor Estates Sub. Ph. III · Plat 442/87'],
@@ -3632,7 +3630,7 @@ function S13_PropertyResearch({ navigate }) {
             <Icon name="check-circle" size={16} color="#1a9e5c" />
             <div>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#1a9e5c' }}>AI cross-check passed</div>
-              <div style={{ fontSize: 11.5, color: '#444', marginTop: 2 }}>All 6 fields match PropMix source data within tolerance.</div>
+              <div style={{ fontSize: 11.5, color: '#444', marginTop: 2 }}>All 6 fields match McKissock MLS source data within tolerance.</div>
             </div>
           </div>
           <Button variant="primary" fullWidth onClick={() => navigate('virtual-inspection')} style={{ marginTop: 14 }}>
@@ -3659,7 +3657,7 @@ function S14_VirtualInspection({ navigate }) {
       subtitle="Move through neighborhood, site, then improvements. Annotation panel floats on the right — AI fires one Socratic question per section." />
 
       <div style={{ marginBottom: 14 }}>
-        <VerifyThisCallout tool="Matterport" claim="3D scan presents the home — but Matterport renders what was scanned, not what's actually there now"
+        <VerifyThisCallout tool="McKissock Inspect" claim="3D scan presents the home — but McKissock Inspect renders what was scanned, not what's actually there now"
         compact
         verifySteps={[
         "Is the scan recent enough to reflect the current condition? Check the scan date in the metadata.",
@@ -3668,7 +3666,7 @@ function S14_VirtualInspection({ navigate }) {
         } />
       </div>
 
-      <WorkfileCaptureButton step="p2" label="Virtual inspection · annotated photos + Matterport scan" source="Matterport + PropMix" />
+      <WorkfileCaptureButton step="p2" label="Virtual inspection · annotated photos + McKissock Inspect scan" source="McKissock Inspect + McKissock MLS" />
 
       <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
         {Object.entries(sections).map(([k, v]) =>
@@ -3689,7 +3687,7 @@ function S14_VirtualInspection({ navigate }) {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 16 }}>
         <MockToolFrame
-          tool={section === 'improvements' ? 'Matterport' : 'PropMix'}
+          tool={section === 'improvements' ? 'McKissock Inspect' : 'McKissock MLS'}
           tab={section === 'improvements' ? '3D scan + photos' : section === 'site' ? 'aerial' : 'street view'}
           height={460}>
           
@@ -3776,13 +3774,13 @@ function S15_GLA({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 2', 'Section VIII']} title="GLA measurement"
-      subtitle="Two-part. (A) Classify floor areas — what counts, what doesn't. (B) Calculate subject GLA from PropMix measurements." />
+      subtitle="Two-part. (A) Classify floor areas — what counts, what doesn't. (B) Calculate subject GLA from McKissock MLS measurements." />
 
       <div style={{ marginBottom: 14 }}>
         <TextbookCallout topic="gla-ansi" why="ANSI Z765 is the standard — know what counts before you measure." />
       </div>
 
-      <WorkfileCaptureButton step="p2" label="GLA worksheet · subject 2,148 sf reconciled" source="PropMix + own measurement" />
+      <WorkfileCaptureButton step="p2" label="GLA worksheet · subject 2,148 sf reconciled" source="McKissock MLS + own measurement" />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 16 }}>
         <Card padding={20}>
@@ -3811,7 +3809,7 @@ function S15_GLA({ navigate }) {
 
         <Card padding={20}>
           <div style={{ fontSize: 11, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 6 }}>Part B · Subject calculation</div>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Calculate from PropMix measurements</div>
+          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>Calculate from McKissock MLS measurements</div>
           <div style={{ background: '#fafafa', borderRadius: 8, padding: 14, fontFamily: "'JetBrains Mono', monospace", fontSize: 12.5, color: '#444', lineHeight: 1.7 }}>
             Lower level (above grade): 32′ × 28.5′ = <strong>912 sf</strong><br />
             Upper level: 32′ × 38.5′ = <strong>1,232 sf</strong><br />
@@ -3820,7 +3818,7 @@ function S15_GLA({ navigate }) {
             <strong>Calculated GLA: 2,148 sf</strong>
           </div>
           <div style={{ marginTop: 14, padding: 12, background: '#edfbf4', border: '1px solid #1a9e5c33', borderRadius: 8, fontSize: 12, color: '#444', lineHeight: 1.5 }}>
-            <strong style={{ color: '#1a9e5c' }}>Match.</strong> Your 2,148 sf matches PropMix records exactly (0% variance · threshold ±2%).
+            <strong style={{ color: '#1a9e5c' }}>Match.</strong> Your 2,148 sf matches McKissock MLS records exactly (0% variance · threshold ±2%).
           </div>
           <Button variant="primary" fullWidth onClick={() => navigate('sketch')} style={{ marginTop: 14 }}>
             Continue · Sketch in Apex <Icon name="arrow-right" size={13} color="#fff" />
@@ -3831,14 +3829,14 @@ function S15_GLA({ navigate }) {
 
 }
 
-// ═══ SCREEN 16: Apex Sketch ══════════════════════════════════
+// ═══ SCREEN 16: McKissock Inspect ══════════════════════════════════
 function S16_Sketch({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 2', 'Section IX']} title="Property sketch"
       subtitle="(A) Find 3 deliberate errors in the sample sketch. (B) Build the subject sketch — GLA must reconcile with your measurement." />
 
-      <MockToolFrame tool="Apex Sketch" tab="subject sketch" height={500}>
+      <MockToolFrame tool="McKissock Inspect" tab="subject sketch" height={500}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 240px', gap: 16, height: '100%' }}>
           <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e8e8e8', padding: 14, position: 'relative' }}>
             <svg width="100%" viewBox="0 0 500 360">
@@ -3906,9 +3904,9 @@ function S17_MentorReview2({ navigate }) {
         </div>
         <div style={{ padding: 18, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }} data-comment-anchor="270c563d1c-div-422-9">
           {[
-          ['Property/site research', 'All PropMix fields complete · cross-check passed', 'ok'],
+          ['Property/site research', 'All McKissock MLS fields complete · cross-check passed', 'ok'],
           ['Virtual inspection', 'V/VI/VII annotations captured · roof + HVAC noted', 'ok'],
-          ['GLA measurement', '2,148 sf · 0.0% variance with PropMix', 'ok'],
+          ['GLA measurement', '2,148 sf · 0.0% variance with McKissock MLS', 'ok'],
           ['Sketch', 'Apex export validated · GLA reconciled', 'ok']].
           map(([label, detail, status], i) =>
           <div key={i} style={{ display: 'flex', gap: 10, padding: 10, background: '#edfbf4', borderRadius: 8, border: '1px solid #1a9e5c33' }}>
@@ -3946,10 +3944,10 @@ function S18_Market({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 3', 'Section XI.A–B']} title="Market analysis"
-      subtitle="PropMix market dashboard left · structured analysis right · Socratic AI challenge below." />
+      subtitle="McKissock MLS market dashboard left · structured analysis right · Ruby challenge below." />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16 }}>
-        <MockToolFrame tool="PropMix" tab="market dashboard" height={500}>
+        <MockToolFrame tool="McKissock MLS" tab="market dashboard" height={500}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 12 }}>
             <div style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 8, padding: 12 }}>
               <div style={{ fontSize: 10.5, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em' }}>Median Sale · 12 mo</div>
@@ -3975,7 +3973,7 @@ function S18_Market({ navigate }) {
             </div>
           </div>
           <div style={{ marginBottom: 10 }}>
-            <VerifyThisCallout tool="AVM" claim="CoreLogic $472,800 · HouseCanary $485,100 · PropMix $478,200"
+            <VerifyThisCallout tool="AVM" claim="CoreLogic $472,800 · HouseCanary $485,100 · McKissock MLS $478,200"
             compact
             verifySteps={[
             "Pull the model card — what data does each AVM ingest? MLS only? Tax records only?",
@@ -3987,7 +3985,7 @@ function S18_Market({ navigate }) {
           <div style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 8, padding: 12 }}>
             <div style={{ fontSize: 10.5, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 8 }}>AVM Cross-check (reference only)</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-              {[['CoreLogic', '$472,800'], ['HouseCanary', '$485,100'], ['PropMix AVM', '$478,200']].map(([k, v], i) =>
+              {[['CoreLogic', '$472,800'], ['HouseCanary', '$485,100'], ['McKissock MLS AVM', '$478,200']].map(([k, v], i) =>
               <div key={i} style={{ background: '#eaf3ff', borderRadius: 6, padding: 8 }}>
                   <div style={{ fontSize: 10, color: '#888' }}>{k}</div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: '#0a6ed1', fontFamily: "'Nunito', sans-serif" }}>{v}</div>
@@ -4008,7 +4006,7 @@ function S18_Market({ navigate }) {
             1. DOM ↓ 28→12 (12mo)<br />2. Sale-to-list 101.2%<br />3. Absorption 2.8mo &lt; 6mo eq.
           </div>
           <div style={{ background: '#1a1d2b', color: '#fff', borderRadius: 8, padding: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}><AIChip label="Socratic" tone="brand" size="sm" /></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}><AIChip label="Ruby" tone="brand" size="sm" /></div>
             <div style={{ fontSize: 12, color: '#e8eaf0', lineHeight: 1.5 }}>
               You concluded <em>increasing</em>. With absorption at 2.8 mo (below the 6-mo equilibrium), I agree the data leans that direction — but defend it: which of the three is your strongest support, and why?
             </div>
@@ -4095,7 +4093,7 @@ function S20_MentorReview3({ navigate }) {
           ['Market trend conclusion', 'Increasing — 3/3 data points cited', 'ok'],
           ['HBU 4-test framework', '3 of 4 tests addressed; T4 pending', 'warn'],
           ['SR1-3 compliance', 'Test 3 narrative thin — mentor will push', 'warn'],
-          ['AVM cross-check', 'CoreLogic + HouseCanary + PropMix noted', 'ok']].
+          ['AVM cross-check', 'CoreLogic + HouseCanary + McKissock MLS noted', 'ok']].
           map(([l, d, s], i) =>
           <div key={i} style={{ padding: 12, background: s === 'ok' ? '#edfbf4' : '#fff8ec', border: `1px solid ${s === 'ok' ? '#1a9e5c33' : '#e8860a33'}`, borderRadius: 8 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -4122,23 +4120,23 @@ function S21_CompSelection({ navigate, tweaks }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 4', 'Section XIII']} title="Comp selection — defend every pick"
-      subtitle="Real PropMix MLS data · AI scores each candidate · you defend each selection against your Socratic AI partner." />
+      subtitle="Real McKissock MLS MLS data · AI scores each candidate · you defend each selection against your Ruby partner." />
 
-      <WorkfileGate step="p4" label="PropMix comp candidates · 47 properties + AI ranking" source="PropMix MLS">
+      <WorkfileGate step="p4" label="McKissock MLS comp candidates · 47 properties + AI ranking" source="McKissock MLS MLS">
         47 candidates with AI match scores. Capture the raw list <em>and</em> your three picks — including the ones you rejected and why.
       </WorkfileGate>
 
       <div style={{ marginBottom: 14 }}>
-        <VerifyThisCallout tool="PropMix" claim="AI ranked C4 (87) higher than C3 (78) on its match score"
+        <VerifyThisCallout tool="McKissock MLS" claim="AI ranked C4 (87) higher than C3 (78) on its match score"
         verifySteps={[
-        "What is the PropMix AI scoring on? Distance and GLA alone, or location quality + sale recency too?",
+        "What is the McKissock MLS AI scoring on? Distance and GLA alone, or location quality + sale recency too?",
         "Check the raw MLS for each candidate — does the AI's ranking match what your own market knowledge says?",
         "Is the highest-scored comp in the same neighborhood, or just within a radius?",
         "Walk the AI's ranking against your three picks — if it disagrees, defend your pick with market evidence, not gut feel."]
         } />
       </div>
 
-      <WorkfileCaptureButton step="p4" label="Comp selection · 3 picks defended" source="PropMix MLS + AI ranking" />
+      <WorkfileCaptureButton step="p4" label="Comp selection · 3 picks defended" source="McKissock MLS MLS + AI ranking" />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 14 }}>
         {/* Left: MLS map + ranked list */}
@@ -4159,7 +4157,7 @@ function S21_CompSelection({ navigate, tweaks }) {
                   </g>);
 
               })}
-              <text x="20" y="195" fontSize="10" fill="#fff" fontFamily="DM Sans" fontWeight="700">PropMix MLS · 47 closed sales · 12 mo · 1mi radius</text>
+              <text x="20" y="195" fontSize="10" fill="#fff" fontFamily="DM Sans" fontWeight="700">McKissock MLS MLS · 47 closed sales · 12 mo · 1mi radius</text>
             </svg>
           </div>
           <div style={{ padding: 12 }}>
@@ -4241,7 +4239,7 @@ function S22_MentorReview4({ navigate }) {
     descriptors: {
       4: 'Each pick defended on market evidence; rejected candidates also documented with reasoning.',
       3: 'Defenses present and credible, but reasoning leans on AI score rather than independent market judgment.',
-      2: 'Some picks defended; others appear to follow PropMix\'s top-ranked output.',
+      2: 'Some picks defended; others appear to follow McKissock MLS\'s top-ranked output.',
       1: 'Accepted AI ranking without independent reasoning.'
     },
     note: "You picked C1/C2/C3 over the AI's top-scored C4. Defense was reasonable, but lean more on neighborhood boundary and bracketing logic — not 'AI is wrong.'"
