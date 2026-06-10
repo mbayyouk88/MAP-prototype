@@ -5,7 +5,8 @@ import MLSTool from './tools/MLSTool';
 import InspectionTool from './tools/InspectionTool';
 import ReportTool from './tools/ReportTool';
 
-const FULL_HEIGHT_ROUTES = ['inspection', 'urar-report', 'report-writing'];
+const FULL_HEIGHT_ROUTES = ['inspection', 'urar-report', 'report-writing',
+  'pr-m3','pr-m3-a','pr-m3-b','pr-m9','pr-m9-a','pr-m9-b'];
 import {
   C, Icon, Button, Badge, Avatar, Card, CardSection, StepTracker, CheckItem,
   Textarea, Input, Toast, PageHeader, ToolCard,
@@ -933,16 +934,6 @@ function PracticeModuleScreen({ module, route, navigate }) {
         <Icon name="hammer" size={14} color="#e8860a" />
         <div style={{ fontSize: 12.5, color: '#7a4a00' }}>Interactive lessons are still being built. Check back soon.</div>
       </div>
-
-      {module.inline && !isExp && module.tools.includes('mls') && (
-        <>
-          <EmbeddedToolPanel title="McKissock MLS" icon="building-2"><MLSTool /></EmbeddedToolPanel>
-          <EmbeddedToolPanel title="McKissock Inspect" icon="scan-eye" height={720}><InspectionTool /></EmbeddedToolPanel>
-        </>
-      )}
-      {module.inline && !isExp && module.tools.includes('urar-report') && !module.tools.includes('mls') && (
-        <EmbeddedToolPanel title="McKissock UAD" icon="clipboard-list" height={800}><ReportTool /></EmbeddedToolPanel>
-      )}
     </div>
   );
 }
@@ -1013,13 +1004,13 @@ function renderScreen(route, navigate, tweaks) {
     // Practice modules
     case 'pr-m1': case 'pr-m1-a': case 'pr-m1-b': return <PracticeModuleScreen module={PRACTICE_MODULES[0]} {...p} />;
     case 'pr-m2': case 'pr-m2-a': case 'pr-m2-b': return <PracticeModuleScreen module={PRACTICE_MODULES[1]} {...p} />;
-    case 'pr-m3': case 'pr-m3-a': case 'pr-m3-b': return <PracticeModuleScreen module={PRACTICE_MODULES[2]} {...p} />;
+    case 'pr-m3': case 'pr-m3-a': case 'pr-m3-b': return <PracticeModuleFullLayout module={PRACTICE_MODULES[2]} route={route} navigate={navigate} />;
     case 'pr-m4': case 'pr-m4-a': case 'pr-m4-b': return <PracticeModuleScreen module={PRACTICE_MODULES[3]} {...p} />;
     case 'pr-m5': case 'pr-m5-a': case 'pr-m5-b': return <PracticeModuleScreen module={PRACTICE_MODULES[4]} {...p} />;
     case 'pr-m6': case 'pr-m6-a': case 'pr-m6-b': return <PracticeModuleScreen module={PRACTICE_MODULES[5]} {...p} />;
     case 'pr-m7': case 'pr-m7-a': case 'pr-m7-b': return <PracticeModuleScreen module={PRACTICE_MODULES[6]} {...p} />;
     case 'pr-m8': case 'pr-m8-a': case 'pr-m8-b': return <PracticeModuleScreen module={PRACTICE_MODULES[7]} {...p} />;
-    case 'pr-m9': case 'pr-m9-a': case 'pr-m9-b': return <PracticeModuleScreen module={PRACTICE_MODULES[8]} {...p} />;
+    case 'pr-m9': case 'pr-m9-a': case 'pr-m9-b': return <PracticeModuleFullLayout module={PRACTICE_MODULES[8]} route={route} navigate={navigate} />;
     default: return <S03_Dashboard {...p} />;
   }
 }
@@ -1084,6 +1075,103 @@ function Step7Layout({ navigate, tweaks }) {
         {tab === 'inspect'  && <InspectionTool />}
         {tab === 'mls'      && <MLSTool />}
       </div>
+    </div>
+  );
+}
+
+const PM_TOOL_META = {
+  mls:          { label: 'McKissock MLS',    icon: 'building-2',    overflow: 'auto' },
+  inspection:   { label: 'McKissock Inspect', icon: 'scan-eye',     overflow: 'hidden' },
+  'urar-report':{ label: 'McKissock UAD',    icon: 'clipboard-list', overflow: 'hidden' },
+};
+
+function PracticeModuleFullLayout({ module, route, navigate }) {
+  const isExp = route?.endsWith('-b');
+  const [tool, setTool] = useState(module.tools[0]);
+
+  const modIdx = PRACTICE_MODULES.findIndex(m => m.id === module.id);
+  const prev = modIdx > 0 ? PRACTICE_MODULES[modIdx - 1] : null;
+  const next = modIdx < PRACTICE_MODULES.length - 1 ? PRACTICE_MODULES[modIdx + 1] : null;
+
+  const tabBtn = (active, label, icon, onClick) => (
+    <button onClick={onClick} style={{
+      display: 'flex', alignItems: 'center', gap: 7, padding: '7px 14px',
+      borderRadius: 7, border: 'none', cursor: 'pointer', fontFamily: 'inherit',
+      fontSize: 12.5, fontWeight: active ? 700 : 400,
+      background: active ? '#fff' : 'transparent', color: active ? '#292929' : '#888',
+      boxShadow: active ? '0 1px 4px rgba(0,0,0,0.10)' : 'none',
+    }}>
+      <Icon name={icon} size={13} color={active ? '#d60436' : '#aaa'} />
+      {label}
+    </button>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      {/* Compact module header */}
+      <div style={{ padding: '12px 24px 10px', borderBottom: '1px solid #e8e8e8', background: '#fff', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Badge>Module {module.id} of 9</Badge>
+            <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: 15, fontWeight: 800, color: '#292929' }}>{module.title}</span>
+          </div>
+          <div style={{ display: 'flex', gap: 5 }}>
+            {prev && <button onClick={() => navigate(prev.route)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', color: '#555', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer' }}><Icon name="chevron-left" size={12} color="#555" />M{prev.id}</button>}
+            {next && <button onClick={() => navigate(next.route)} style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '4px 10px', borderRadius: 6, border: '1px solid #e8e8e8', background: '#fff', color: '#555', fontFamily: 'inherit', fontSize: 11.5, cursor: 'pointer' }}>M{next.id}<Icon name="chevron-right" size={12} color="#555" /></button>}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 3, background: '#f0f1f3', borderRadius: 8, padding: 3, width: 'fit-content' }}>
+          {tabBtn(!isExp, 'Instructional', 'monitor', () => navigate(module.route + '-a'))}
+          {tabBtn(isExp,  'Experiential',  'map-pin',  () => navigate(module.route + '-b'))}
+        </div>
+      </div>
+
+      {isExp ? (
+        /* Experiential tab — scrollable card */
+        <div style={{ flex: 1, overflow: 'auto', padding: '20px 24px 60px' }}>
+          <Card padding={22}>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ width: 36, height: 36, borderRadius: 9, background: 'linear-gradient(135deg, #1a9e5c, #2fd88a)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Icon name="map-pin" size={17} color="#fff" />
+              </div>
+              <div>
+                <div style={{ fontSize: 10.5, fontWeight: 800, color: '#888', textTransform: 'uppercase', letterSpacing: '.07em', marginBottom: 8 }}>Your assignment</div>
+                <p style={{ fontSize: 13.5, color: '#444', lineHeight: 1.7, margin: 0 }}>{module.experiential}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      ) : (
+        /* Instructional tab — tool switcher fills the rest of the screen */
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+          {module.tools.length > 1 && (
+            <div style={{ display: 'flex', padding: '0 20px', borderBottom: '1px solid #e8e8e8', background: '#fafafa', flexShrink: 0 }}>
+              {module.tools.map(t => {
+                const m = PM_TOOL_META[t];
+                const active = tool === t;
+                return (
+                  <button key={t} onClick={() => setTool(t)}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 7, padding: '9px 16px',
+                      border: 'none', borderBottom: active ? '2px solid #d60436' : '2px solid transparent',
+                      background: 'none', cursor: 'pointer', fontFamily: 'inherit',
+                      fontSize: 12.5, fontWeight: active ? 700 : 400,
+                      color: active ? '#d60436' : '#666', marginBottom: -1,
+                    }}>
+                    <Icon name={m.icon} size={13} color={active ? '#d60436' : '#999'} />
+                    {m.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <div style={{ flex: 1, overflow: PM_TOOL_META[tool]?.overflow || 'auto' }}>
+            {tool === 'mls'          && <MLSTool />}
+            {tool === 'inspection'   && <InspectionTool />}
+            {tool === 'urar-report'  && <ReportTool />}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
