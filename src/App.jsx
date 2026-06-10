@@ -1017,11 +1017,11 @@ function renderScreen(route, navigate, tweaks) {
     case 'preliminary-research': return <S08_PrelimResearch {...p} />;
     case 'inspection-scheduling': return <S09_InspectionScheduling {...p} />;
     case 'mentor-review-1': return <S10_MentorReview1 {...p} />;
-    case 'phase-2-launch': return <Step2WithTools><S12_CaseDrop {...p} /></Step2WithTools>;
-    case 'property-research': return <Step2WithTools><S13_PropertyResearch {...p} /></Step2WithTools>;
-    case 'virtual-inspection': return <Step2WithTools><S14_VirtualInspection {...p} /></Step2WithTools>;
-    case 'gla-measurement': return <Step2WithTools><S15_GLA {...p} /></Step2WithTools>;
-    case 'sketch': return <Step2WithTools><S16_Sketch {...p} /></Step2WithTools>;
+    case 'phase-2-launch': return <S12_CaseDrop {...p} />;
+    case 'property-research': return <S13_PropertyResearch {...p} />;
+    case 'virtual-inspection': return <S14_VirtualInspection {...p} />;
+    case 'gla-measurement': return <S15_GLA {...p} />;
+    case 'sketch': return <S16_Sketch {...p} />;
     case 'mentor-review-2': return <S17_MentorReview2 {...p} />;
     case 'market-analysis': return <S18_Market {...p} />;
     case 'hbu': return <S19_HBU {...p} />;
@@ -1171,7 +1171,13 @@ function PracticeModuleFullLayout({ module, route, navigate }) {
 
 // ── Step tool bar ─────────────────────────────────────────────────
 const STEP_TOOLS = {
-  // Step 2 — tools are now embedded inline, not shown as toolbar buttons
+  // Step 2 — toolbar links navigate to each tool as a separate full screen
+  'phase-2-launch':    ['mls','inspection'],
+  'property-research': ['mls','inspection'],
+  'virtual-inspection':['mls','inspection'],
+  'gla-measurement':   ['mls','inspection'],
+  'sketch':            ['mls','inspection'],
+  'mentor-review-2':   ['mls','inspection'],
   'market-analysis':   ['mls'],
   'hbu':               ['mls'],
   'mentor-review-3':   ['mls'],
