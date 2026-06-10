@@ -801,8 +801,8 @@ function StatTile({ label, value, sub, trend, color = '#d60436', icon }) {
 const SUBJECT = {
   address: '4218 Ridgewood Lane',
   city: 'Glenmoor, OH 44023',
-  photo: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80',
-  type: 'Single-Family Detached', style: '2-Story Colonial',
+  photo: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80',
+  type: 'Condominium', style: 'Mid-Rise Condo',
   yearBuilt: 2008, gla: 2148, beds: 4, baths: 2.5, lot: 0.31,
   garage: '2-car attached', basement: 'Full, finished',
   apn: '14-022-37-104', zone: 'R-1 (Single-Family Residential)',

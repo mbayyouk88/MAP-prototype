@@ -5,7 +5,7 @@ import MLSTool from './tools/MLSTool';
 import InspectionTool from './tools/InspectionTool';
 import ReportTool from './tools/ReportTool';
 
-const FULL_HEIGHT_ROUTES = ['inspection', 'urar-report'];
+const FULL_HEIGHT_ROUTES = ['inspection', 'urar-report', 'report-writing'];
 import {
   C, Icon, Button, Badge, Avatar, Card, CardSection, StepTracker, CheckItem,
   Textarea, Input, Toast, PageHeader, ToolCard,
@@ -804,7 +804,7 @@ const PRACTICE_MODULES = [
     title: 'Collection and Analysis of Data',
     instructional: 'McKissock MLS — search comparable listings and sales, filter by property type, analyze market trends for each of the 4 properties. McKissock Inspect — conduct a virtual walkthrough via Matterport, record condition/quality ratings, and produce a floor plan sketch.',
     experiential: 'Physically visit a property and complete a structured field worksheet (condition, quality, measurements). Pull the same property\'s public record from the County Assessor and compare findings.',
-    tools: ['mls', 'inspection'] },
+    tools: ['mls', 'inspection'], inline: true },
   { id: 4, route: 'pr-m4', icon: 'building-2',
     title: 'Determination of Highest and Best Use',
     instructional: 'Covers the 4 HBU tests (legally permissible, physically possible, financially feasible, maximally productive). Applies each test to all 4 properties, highlighting how zoning and ownership type constrain HBU differently. Decision tree handles properties where current use may not be HBU (e.g., underimproved Pilsen lot); knowledge check asks trainees to state and support the HBU conclusion for each property.',
@@ -834,7 +834,7 @@ const PRACTICE_MODULES = [
     title: 'Reporting of the Appraisal',
     instructional: 'McKissock UAD (3.6) — finalize the complete UAD 3.6 report for each property, review built-in USPAP compliance checkpoints, and submit for mentor review. The form surfaces any incomplete or inconsistent fields before final submission.',
     experiential: 'Contact an AMC coordinator or lender reviewer — ask what causes report kickbacks and what a "clean" report looks like. Reflect on how those standards show up in your completed McKissock UAD output.',
-    tools: ['urar-report'] },
+    tools: ['urar-report'], inline: true },
 ];
 
 const TOOL_LABELS = { mls: 'McKissock MLS', inspection: 'McKissock Inspect', 'urar-report': 'McKissock UAD' };
@@ -933,6 +933,16 @@ function PracticeModuleScreen({ module, route, navigate }) {
         <Icon name="hammer" size={14} color="#e8860a" />
         <div style={{ fontSize: 12.5, color: '#7a4a00' }}>Interactive lessons are still being built. Check back soon.</div>
       </div>
+
+      {module.inline && !isExp && module.tools.includes('mls') && (
+        <>
+          <EmbeddedToolPanel title="McKissock MLS" icon="building-2"><MLSTool /></EmbeddedToolPanel>
+          <EmbeddedToolPanel title="McKissock Inspect" icon="scan-eye" height={720}><InspectionTool /></EmbeddedToolPanel>
+        </>
+      )}
+      {module.inline && !isExp && module.tools.includes('urar-report') && !module.tools.includes('mls') && (
+        <EmbeddedToolPanel title="McKissock UAD" icon="clipboard-list" height={800}><ReportTool /></EmbeddedToolPanel>
+      )}
     </div>
   );
 }
@@ -971,11 +981,11 @@ function renderScreen(route, navigate, tweaks) {
     case 'preliminary-research': return <S08_PrelimResearch {...p} />;
     case 'inspection-scheduling': return <S09_InspectionScheduling {...p} />;
     case 'mentor-review-1': return <S10_MentorReview1 {...p} />;
-    case 'phase-2-launch': return <S12_CaseDrop {...p} />;
-    case 'property-research': return <S13_PropertyResearch {...p} />;
-    case 'virtual-inspection': return <S14_VirtualInspection {...p} />;
-    case 'gla-measurement': return <S15_GLA {...p} />;
-    case 'sketch': return <S16_Sketch {...p} />;
+    case 'phase-2-launch': return <Step2WithTools><S12_CaseDrop {...p} /></Step2WithTools>;
+    case 'property-research': return <Step2WithTools><S13_PropertyResearch {...p} /></Step2WithTools>;
+    case 'virtual-inspection': return <Step2WithTools><S14_VirtualInspection {...p} /></Step2WithTools>;
+    case 'gla-measurement': return <Step2WithTools><S15_GLA {...p} /></Step2WithTools>;
+    case 'sketch': return <Step2WithTools><S16_Sketch {...p} /></Step2WithTools>;
     case 'mentor-review-2': return <S17_MentorReview2 {...p} />;
     case 'market-analysis': return <S18_Market {...p} />;
     case 'hbu': return <S19_HBU {...p} />;
@@ -987,7 +997,7 @@ function renderScreen(route, navigate, tweaks) {
     case 'mentor-review-5': return <S_MentorReviewStub n={5} step={5} prevRoute="valuation" nextRoute="reconciliation" {...p} />;
     case 'reconciliation': return <S_Reconciliation {...p} />;
     case 'mentor-review-6': return <S_MentorReviewStub n={6} step={6} prevRoute="reconciliation" nextRoute="report-writing" {...p} />;
-    case 'report-writing': return <S_ReportWriting {...p} />;
+    case 'report-writing': return <Step7Layout navigate={navigate} tweaks={tweaks} />;
     case 'uspap-checklist': return <S_USPAPChecklistScreen {...p} />;
     case 'mentor-review-7': return <S_MentorReviewStub n={7} step={7} prevRoute="report-writing" nextRoute="capstone" {...p} />;
     case 'mentor-review-8': return <S_MentorReviewStub n={8} step={8} prevRoute="capstone" nextRoute={null} {...p} />;
@@ -1015,14 +1025,72 @@ function renderScreen(route, navigate, tweaks) {
 }
 
 // ── Root App ──────────────────────────────────────────────────────
+// ── Shared inline tool embed ──────────────────────────────────────
+function EmbeddedToolPanel({ title, icon, height, children }) {
+  return (
+    <div style={{ marginTop: 28 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <Icon name={icon} size={14} color="#555" />
+        <span style={{ fontSize: 13, fontWeight: 700, color: '#292929' }}>{title}</span>
+      </div>
+      <div style={{ border: '1px solid #e0e0e0', borderRadius: 12, overflow: 'hidden', ...(height ? { height } : {}) }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Step2WithTools({ children }) {
+  return (
+    <div>
+      {children}
+      <EmbeddedToolPanel title="McKissock MLS" icon="building-2"><MLSTool /></EmbeddedToolPanel>
+      <EmbeddedToolPanel title="McKissock Inspect" icon="scan-eye" height={720}><InspectionTool /></EmbeddedToolPanel>
+    </div>
+  );
+}
+
+function Step7Layout({ navigate, tweaks }) {
+  const [tab, setTab] = useState('report');
+  const TABS = [
+    { id: 'report',   label: 'McKissock UAD',    icon: 'clipboard-list' },
+    { id: 'workfile', label: 'Workfile',          icon: 'folder-open' },
+    { id: 'inspect',  label: 'McKissock Inspect', icon: 'scan-eye' },
+    { id: 'mls',      label: 'McKissock MLS',     icon: 'building-2' },
+  ];
+  const isFixed = tab === 'report' || tab === 'inspect';
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <div style={{ display: 'flex', padding: '0 20px', borderBottom: '1px solid #e8e8e8', background: '#fff', flexShrink: 0 }}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 7, padding: '10px 16px',
+              border: 'none', borderBottom: tab === t.id ? '2px solid #d60436' : '2px solid transparent',
+              background: 'none', cursor: 'pointer', fontFamily: 'inherit',
+              fontSize: 12.5, fontWeight: tab === t.id ? 700 : 400,
+              color: tab === t.id ? '#d60436' : '#666',
+              marginBottom: -1, transition: 'color 120ms, border-color 120ms',
+            }}
+          >
+            <Icon name={t.icon} size={13} color={tab === t.id ? '#d60436' : '#999'} />
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div style={{ flex: 1, overflow: isFixed ? 'hidden' : 'auto' }}>
+        {tab === 'report'   && <ReportTool />}
+        {tab === 'workfile' && <div style={{ padding: '24px 28px 80px' }}><S30b_Workfile navigate={navigate} tweaks={tweaks} /></div>}
+        {tab === 'inspect'  && <InspectionTool />}
+        {tab === 'mls'      && <MLSTool />}
+      </div>
+    </div>
+  );
+}
+
 // ── Step tool bar ─────────────────────────────────────────────────
 const STEP_TOOLS = {
-  'phase-2-launch':    ['mls','inspection'],
-  'property-research': ['mls','inspection'],
-  'virtual-inspection':['mls','inspection'],
-  'gla-measurement':   ['mls','inspection'],
-  'sketch':            ['mls','inspection'],
-  'mentor-review-2':   ['mls','inspection'],
+  // Step 2 — tools are now embedded inline, not shown as toolbar buttons
   'market-analysis':   ['mls'],
   'hbu':               ['mls'],
   'mentor-review-3':   ['mls'],
@@ -1033,7 +1101,7 @@ const STEP_TOOLS = {
   'mentor-review-5':   ['urar-report'],
   'reconciliation':    ['urar-report'],
   'mentor-review-6':   ['urar-report'],
-  'report-writing':    ['urar-report'],
+  // Step 7 — tools are now embedded inline as tabs
   'uspap-checklist':   ['urar-report'],
   'mentor-review-7':   ['urar-report'],
   'capstone':          ['workfile'],
