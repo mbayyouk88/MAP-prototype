@@ -22,7 +22,7 @@ import {
   S06_ToolOrientation, S07_Engagement, S08_PrelimResearch, S09_InspectionScheduling, S10_MentorReview1,
   S12_CaseDrop, S13_PropertyResearch, S14_VirtualInspection, S15_GLA, S16_Sketch,
   S17_MentorReview2, S18_Market, S19_HBU, S20_MentorReview3, S21_CompSelection, S22_MentorReview4,
-  svgAvatar
+  svgAvatar, RubiMark
 } from './allTheThings';
 
 // ── PAREA Sidebar navigation ──────────────────────────────────────
@@ -295,7 +295,7 @@ function PAREASidebar({ active, onNav, collapsed }) {
   );
 }
 
-// ── Ruby Panel ─────────────────────────────────────────────
+// ── Rubi Panel ─────────────────────────────────────────────
 const AI_SCREENS = new Set(['engagement-letter','preliminary-research','inspection-scheduling','market-analysis','hbu','comp-selection','adjustment-grid','valuation','reconciliation','report-writing']);
 
 const SOCRATIC_PROMPTS = {
@@ -345,7 +345,7 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
   if (collapsed) {
     return (
       <aside className={shake ? 'socratic-attention' : ''} onClick={onToggle}
-        title="Open Ruby"
+        title="Open Rubi"
         style={{
           width: 44, flexShrink: 0, cursor: 'pointer',
           background: 'linear-gradient(180deg, #1a1d2b, #2a1d3a)',
@@ -358,19 +358,14 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
           background: 'rgba(255,255,255,0.05)',
           border: '1px solid rgba(255,255,255,0.09)',
         }}>
-          <div style={{
-            width: 30, height: 30, borderRadius: 8,
-            background: `linear-gradient(135deg, ${accent}, #ff5577)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: `0 0 14px ${accent}55`,
-          }}>
-            <Icon name="sparkles" size={14} color="#fff" />
+          <div style={{ filter: `drop-shadow(0 0 8px ${accent}88)` }}>
+            <RubiMark size={28} variant="brand" />
           </div>
           <div style={{
             writingMode: 'vertical-rl', transform: 'rotate(180deg)',
             fontSize: 9, fontWeight: 800, color: '#ff8da3',
             letterSpacing: '.12em', textTransform: 'uppercase',
-          }}>Ruby</div>
+          }}>Rubi</div>
           <span style={{
             width: 7, height: 7, borderRadius: '50%',
             background: accent, boxShadow: `0 0 8px ${accent}`,
@@ -389,11 +384,11 @@ function SocraticPanel({ collapsed, onToggle, route, shake }) {
       borderLeft: '1px solid #2a2d3b',
     }}>
       <div style={{ padding: '14px 16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div style={{ width: 28, height: 28, borderRadius: 7, flexShrink: 0, background: `linear-gradient(135deg, ${accent}, #ff5577)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Icon name="sparkles" size={14} color="#fff" />
+        <div style={{ flexShrink: 0, filter: `drop-shadow(0 0 6px ${accent}66)` }}>
+          <RubiMark size={30} variant="brand" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 12.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.005em' }}>Ruby</div>
+          <div style={{ fontSize: 12.5, fontWeight: 800, fontFamily: "'Nunito', sans-serif", letterSpacing: '-0.005em' }}>Rubi</div>
           <div style={{ fontSize: 10, color: '#cbd0e0', letterSpacing: '.04em' }}>Your AI mentor partner</div>
         </div>
         <button onClick={onToggle} style={{ background: 'rgba(255,255,255,0.06)', border: 'none', cursor: 'pointer', color: '#cbd0e0', padding: 5, borderRadius: 5, display: 'flex' }} title="Collapse">
@@ -507,11 +502,11 @@ function S_WelcomeIntro({ navigate }) {
         {[
           { icon: 'file-text', color: '#d60436', bg: '#fff0f3', title: '3 Real Reports', body: 'Complete three full URAR appraisals from problem ID through final delivery — each one graded by a certified mentor.' },
           { icon: 'user-check', color: '#1a9e5c', bg: '#edfbf4', title: '24 Mentor Reviews', body: 'James Mendel, MAI will review every critical decision point. Async turnaround in 48 hours.' },
-          { icon: 'sparkles', color: '#0a6ed1', bg: '#eef5ff', title: 'Ruby — Your AI Partner', body: 'Ruby asks the questions your mentor will ask — before they ask them. She builds your thinking, not your answers.' },
+          { icon: null, color: '#0a6ed1', bg: '#eef5ff', title: 'Rubi — Your AI Partner', body: 'Rubi asks the questions your mentor will ask — before they ask them. She builds your thinking, not your answers.' },
         ].map(({ icon, color, bg, title, body }) => (
           <div key={title} style={{ background: '#fff', border: '1px solid #e8e8e8', borderRadius: 12, padding: 20 }}>
             <div style={{ width: 40, height: 40, borderRadius: 10, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-              <Icon name={icon} size={20} color={color} />
+              {icon ? <Icon name={icon} size={20} color={color} /> : <RubiMark size={28} variant="dark" />}
             </div>
             <div style={{ fontSize: 14, fontWeight: 700, color: '#292929', marginBottom: 6, fontFamily: "'Nunito', sans-serif" }}>{title}</div>
             <div style={{ fontSize: 12.5, color: '#666', lineHeight: 1.55 }}>{body}</div>
@@ -647,7 +642,7 @@ function S_Valuation({ navigate }) {
             ))}
           </div>
           <div style={{ background: '#1a1d2b', borderRadius: 8, padding: 16, color: '#fff' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><AIChip label="Ruby" tone="brand" size="sm" /></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}><AIChip label="Rubi" tone="brand" size="sm" /></div>
             <div style={{ fontSize: 12.5, lineHeight: 1.55, color: '#e8eaf0' }}>Three adjusted values around $482–483K. Which comp carries the most weight, and why?</div>
           </div>
         </Card>
@@ -802,17 +797,17 @@ function S_ClientCommunication({ navigate }) {
             <ChatBubble from="persona" name={PERSONAS.maya.name} role="Loan Officer" time="2:04 PM" avatar={PERSONAS.maya.avatar}>
               Got the report — thank you. Quick question: the value came in at <strong>$488,000</strong> but the contract is at <strong>$505,000</strong>. My underwriter is going to ask questions. Can you walk me through why?
             </ChatBubble>
-            <ChatBubble from="ai" name="Ruby" time="2:05 PM">
+            <ChatBubble from="ai" name="Rubi" time="2:05 PM">
               Before you respond — this is the moment that tests your independence. Maya's tone is professional, not adversarial, but the pressure is real. What's your obligation here under USPAP Ethics?
             </ChatBubble>
             <ChatBubble from="persona" name={PERSONAS.maya.name} role="Loan Officer" time="2:07 PM" avatar={PERSONAS.maya.avatar}>
               Also — my borrower's agent says there was a similar unit in the building that sold for $510K last month. Shouldn't that be a comp?
             </ChatBubble>
-            <ChatBubble from="ai" name="Ruby" time="2:08 PM">
+            <ChatBubble from="ai" name="Rubi" time="2:08 PM">
               Good challenge. You need to address this specifically — either explain why you considered and rejected it, or acknowledge the error and issue an addendum. Which is it?
             </ChatBubble>
             {messages.map((m, i) => (
-              <ChatBubble key={i} from={m.from === 'user' ? 'user' : 'ai'} name={m.from === 'user' ? 'You' : 'Ruby'} time="Now">
+              <ChatBubble key={i} from={m.from === 'user' ? 'user' : 'ai'} name={m.from === 'user' ? 'You' : 'Rubi'} time="Now">
                 {m.text}
               </ChatBubble>
             ))}
@@ -856,7 +851,7 @@ function S_ClientCommunication({ navigate }) {
               <div style={{ width: 26, height: 26, borderRadius: 6, background: 'linear-gradient(135deg, #d60436, #ff5577)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name="sparkles" size={13} color="#fff" />
               </div>
-              <span style={{ fontSize: 12.5, fontWeight: 700 }}>Ruby's coaching</span>
+              <span style={{ fontSize: 12.5, fontWeight: 700 }}>Rubi's coaching</span>
             </div>
             <p style={{ fontSize: 12, color: '#cbd0e0', lineHeight: 1.6, margin: 0 }}>
               Client pushback on value is not personal. Your job is to explain the market, not defend the number. Lead with the comp data. If the contract-sale spread surprises you, it should surprise them too — for the right reasons.

@@ -589,6 +589,29 @@ function CompressionCurve({ height = 120, width = 360 }) {
 
 }
 
+// ── Rubi logo mark (inline SVG — pointy-top hex + 4-pt star + open book) ─
+export function RubiMark({ size = 32, variant = 'dark' }) {
+  // dark  = near-black hex, white interior  (for light backgrounds)
+  // light = white hex, dark interior        (for dark backgrounds)
+  // brand = brand-red hex, white interior   (for panel icon)
+  const bg = variant === 'light' ? '#fff' : variant === 'brand' ? '#d60436' : '#231f20';
+  const fg = variant === 'light' ? '#231f20' : '#fff';
+  const h  = Math.round(size * 1.14);
+  return (
+    <svg width={size} height={h} viewBox="0 0 50 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Pointy-top hexagon */}
+      <path d="M25 2 L46.7 14.5 L46.7 42.5 L25 55 L3.3 42.5 L3.3 14.5 Z" fill={bg} />
+      {/* 4-pointed sparkle — upper-right quadrant */}
+      <path d="M28 12 L29.6 17.4 L35 19 L29.6 20.6 L28 26 L26.4 20.6 L21 19 L26.4 17.4 Z" fill={fg} />
+      {/* Small accent dot */}
+      <circle cx="37" cy="13" r="2" fill={fg} />
+      {/* Open book — lower center */}
+      <path d="M25 35 C20 33 12 30 7 28 L8 24 C13 26 20 29 25 31 Z" fill={fg} />
+      <path d="M25 35 C30 33 38 30 43 28 L42 24 C37 26 30 29 25 31 Z" fill={fg} />
+    </svg>
+  );
+}
+
 // ── ChatBubble (AI conversation) ─────────────────────────────
 function ChatBubble({ from, name, avatar, role, time, children, accent }) {
   const isAI = from === 'ai' || from === 'persona';
@@ -598,17 +621,20 @@ function ChatBubble({ from, name, avatar, role, time, children, accent }) {
       display: 'flex', gap: 10, marginBottom: 14,
       flexDirection: isUser ? 'row-reverse' : 'row'
     }}>
-      {avatar ?
-      <img src={avatar} alt={name || ''} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #fff', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} /> :
-
-      <div style={{
-        width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
-        background: isAI ? 'linear-gradient(135deg, #d60436, #ff5577)' : '#e8e8e8',
-        color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 12, fontWeight: 800
-      }}>
-          {isAI ? 'AI' : (name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('')}
-        </div>
+      {avatar
+        ? <img src={avatar} alt={name || ''} style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #fff', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }} />
+        : from === 'ai'
+          ? <div style={{ width: 34, height: 34, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <RubiMark size={30} variant="dark" />
+            </div>
+          : <div style={{
+              width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+              background: isAI ? 'linear-gradient(135deg, #d60436, #ff5577)' : '#e8e8e8',
+              color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 12, fontWeight: 800
+            }}>
+              {(name || '?').split(' ').map((w) => w[0]).slice(0, 2).join('')}
+            </div>
       }
       <div style={{ maxWidth: '78%', display: 'flex', flexDirection: 'column', alignItems: isUser ? 'flex-end' : 'flex-start' }}>
         {(name || role) &&
@@ -616,7 +642,12 @@ function ChatBubble({ from, name, avatar, role, time, children, accent }) {
             <span style={{ fontWeight: 700, color: '#292929' }}>{name}</span>
             {role && <span>{role}</span>}
             {time && <span>· {time}</span>}
-            {isAI && from === 'ai' && <AIChip label="Ruby" size="sm" tone="dark" />}
+            {isAI && from === 'ai' && (
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#1a1d2b', padding: '1px 7px 1px 3px', borderRadius: 4, fontSize: 9, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: '#ff8da3', fontFamily: "'JetBrains Mono', monospace" }}>
+                <RubiMark size={13} variant="brand" />
+                Rubi
+              </span>
+            )}
           </div>
         }
         <div style={{
@@ -2520,7 +2551,7 @@ function S03_Dashboard({ navigate, tweaks }) {
             Comp Selection — Report 1
           </h1>
           <p style={{ fontSize: 13.5, color: '#555', marginTop: 6, maxWidth: 560, lineHeight: 1.5 }}>
-            McKissock MLS returned 47 candidates within your market boundary. AI scored them — your next move is to pick 3–5 and defend each selection against your Ruby partner.
+            McKissock MLS returned 47 candidates within your market boundary. AI scored them — your next move is to pick 3–5 and defend each selection against your Rubi partner.
           </p>
           <div style={{ display: 'flex', gap: 16, marginTop: 14, fontSize: 12, color: '#666' }}>
             <div><span style={{ color: '#d60436' }}>● </span><strong>~45 min</strong> est.</div>
@@ -2967,7 +2998,7 @@ function S07_Engagement({ navigate, tweaks }) {
       <PageHeader breadcrumb={['Step 1', 'Section II.A']} title="Engagement letter — Maya Chen"
       subtitle="The AI plays the loan officer. Draft the engagement letter; she'll push back until the scope is USPAP-tight." />
 
-      <WorkfileGate step="p1" label="Engagement letter · Maya Chen sim transcript" source="Ruby + persona sim">
+      <WorkfileGate step="p1" label="Engagement letter · Maya Chen sim transcript" source="Rubi + persona sim">
         Capture this AI chat — every revision Maya forces and every push the AI makes belongs in your workfile.
       </WorkfileGate>
 
@@ -2989,7 +3020,7 @@ function S07_Engagement({ navigate, tweaks }) {
             <ChatBubble from="user" name="You" time="9:16 AM">
               Yes — sending an engagement letter now. I'll need access to inspect the property within the next 5 business days.
             </ChatBubble>
-            <ChatBubble from="ai" name="Ruby" time="9:17 AM">
+            <ChatBubble from="ai" name="Rubi" time="9:17 AM">
               Before you send — your draft is missing the <strong>USPAP edition in effect</strong> and doesn't address whether any extraordinary assumptions apply. The lender will accept the letter as-is, but your mentor will flag both. Add them?
             </ChatBubble>
             <ChatBubble from="persona" name={PERSONAS.maya.name} role="Loan Officer" time="9:21 AM" avatar={PERSONAS.maya.avatar}>
@@ -3167,7 +3198,7 @@ function S08_PrelimResearch({ navigate }) {
 
           <Card padding={0} style={{ background: '#1a1d2b', color: '#fff' }}>
             <div style={{ padding: '14px 16px', borderBottom: '1px solid #2a2d3b', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <AIChip label="Ruby" tone="brand" size="sm" />
+              <AIChip label="Rubi" tone="brand" size="sm" />
               <span style={{ fontSize: 12, color: '#cbd0e0' }}>One question before you advance</span>
             </div>
             <div style={{ padding: 16 }}>
@@ -3228,7 +3259,7 @@ function S09_InspectionScheduling({ navigate }) {
           <ChatBubble from="user" name="You" time="2:13 PM">
             Got it — basement is rented. How about <strong>Friday at 10am</strong>? That gives you and Lily two days notice. I'll need access to all interior spaces including the basement unit.
           </ChatBubble>
-          <ChatBubble from="ai" name="Ruby" time="2:14 PM">
+          <ChatBubble from="ai" name="Rubi" time="2:14 PM">
             Good catch on the tenant — note this in your workfile, it may affect highest & best use. One more thing to confirm: <strong>day-of contact number</strong>, and <strong>any access restrictions</strong> (gates, dogs, alarms).
           </ChatBubble>
           <ChatBubble from="persona" name="David Osei" role="Homeowner" time="2:18 PM" avatar={PERSONAS.david.avatar}>
@@ -3944,7 +3975,7 @@ function S18_Market({ navigate }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 3', 'Section XI.A–B']} title="Market analysis"
-      subtitle="McKissock MLS market dashboard left · structured analysis right · Ruby challenge below." />
+      subtitle="McKissock MLS market dashboard left · structured analysis right · Rubi challenge below." />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16 }}>
         <MockToolFrame tool="McKissock MLS" tab="market dashboard" height={500}>
@@ -4006,7 +4037,7 @@ function S18_Market({ navigate }) {
             1. DOM ↓ 28→12 (12mo)<br />2. Sale-to-list 101.2%<br />3. Absorption 2.8mo &lt; 6mo eq.
           </div>
           <div style={{ background: '#1a1d2b', color: '#fff', borderRadius: 8, padding: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}><AIChip label="Ruby" tone="brand" size="sm" /></div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}><AIChip label="Rubi" tone="brand" size="sm" /></div>
             <div style={{ fontSize: 12, color: '#e8eaf0', lineHeight: 1.5 }}>
               You concluded <em>increasing</em>. With absorption at 2.8 mo (below the 6-mo equilibrium), I agree the data leans that direction — but defend it: which of the three is your strongest support, and why?
             </div>
@@ -4120,7 +4151,7 @@ function S21_CompSelection({ navigate, tweaks }) {
   return (
     <div>
       <PageHeader breadcrumb={['Step 4', 'Section XIII']} title="Comp selection — defend every pick"
-      subtitle="Real McKissock MLS MLS data · AI scores each candidate · you defend each selection against your Ruby partner." />
+      subtitle="Real McKissock MLS MLS data · AI scores each candidate · you defend each selection against your Rubi partner." />
 
       <WorkfileGate step="p4" label="McKissock MLS comp candidates · 47 properties + AI ranking" source="McKissock MLS MLS">
         47 candidates with AI match scores. Capture the raw list <em>and</em> your three picks — including the ones you rejected and why.
